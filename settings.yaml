@@ -1,0 +1,10 @@
+SLAM.alg: "OrbSlam3"
+#--------------------------------------------------------------------------------------------
+# SLAM Method: change with the name of the .py file in whitch there are the class SLAM
+#--------------------------------------------------------------------------------------------
+
+#--------------------------------------------------------------------------------------------
+# SLAM Params: add your own to run the algorithm
+#--------------------------------------------------------------------------------------------
+SLAM.vocab_path: "slam_method/Settings/ORBvoc.bin"
+SLAM.settings_path: "slam_method/Settings/OrbSlam3_KITTI_02.yaml"
