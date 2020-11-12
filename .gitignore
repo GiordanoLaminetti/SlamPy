@@ -138,3 +138,8 @@ Dataset/
 .*.ipynb
 .vscode
 *.csv
+.jupyter
+.local_settings
+.ipython
+.config
+

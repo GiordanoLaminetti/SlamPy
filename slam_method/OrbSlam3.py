@@ -2,8 +2,8 @@ import orbslam3
 import sys
 import os.path
 sys.path.append("..")
-from pyslam import State
-from pyslam import Sensor
+from slampy import State
+from slampy import Sensor
 
 class Slam():
 
@@ -12,10 +12,10 @@ class Slam():
         vocab_file = params['SLAM.vocab_path']
 
         #check the existence of the configuration file
-        
+
         if not os.path.exists(config_file):
             raise FileNotFoundError(config_file+" not found")
-        
+
         if not os.path.exists(vocab_file):
             raise FileNotFoundError(vocab_file+" not found")
 
@@ -68,7 +68,7 @@ class Slam():
             self.slam.process_image_imu_mono(image, tframe, imu,'0')
         else:
             raise Exception("The sensor type is not MONOCULAR_IMU")
-    
+
     def process_image_imu_stereo(self,image_left,image_right,tframe,imu):
         if self.sensor_type == Sensor.STEREO_IMU:
             self.slam.process_image_imu_stereo(image,tframe,imu,'0')
@@ -80,7 +80,7 @@ class Slam():
             self.slam.process_image_rgbd(image,tframe,'0')
         else:
             raise Exception("The sensor type is not RGBD")
-        
+
     def get_pose(self):
         if self.slam.get_tracking_state() == orbslam3.TrackingState.OK:
             return self.slam.get_frame_pose()
@@ -91,7 +91,7 @@ class Slam():
 
     def get_camera_matrix(self):
         return self.slam.get_camera_matrix()
-    
+
     def get_state(self):
         if self.slam.get_tracking_state() ==  orbslam3.TrackingState.OK:
             return State.OK

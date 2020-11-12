@@ -1,20 +1,21 @@
-import orbslam2
 import sys
-import os.path
 sys.path.append("..")
-from pyslam import State
-from pyslam import Sensor
+from slampy import Sensor
+from slampy import State
+import orbslam2
+import os.path
 
-class SLAM():
+
+class Slam():
     def __init__(self, params, sensor_type):
         config_file = params['SLAM.settings_path']
         vocab_file = params['SLAM.vocab_path']
 
-        #check the existence of the configuration file
-        
+        # check the existence of the configuration file
+
         if not os.path.exists(config_file):
             raise FileNotFoundError(config_file+" not found")
-        
+
         if not os.path.exists(vocab_file):
             raise FileNotFoundError(vocab_file+" not found")
 
@@ -70,19 +71,18 @@ class SLAM():
 
     def get_abs_cloud(self):
         if self.slam.get_tracking_state() == orbslam2.TrackingState.OK:
-            return self.get_tracked_mappoints()
+            return self.slam.get_tracked_mappoints()
 
     def get_camera_matrix(self):
         return self.slam.get_camera_matrix()
 
     def get_state(self):
-        if self.slam.get_tracking_state() ==  orbslam2.TrackingState.OK:
+        if self.slam.get_tracking_state() == orbslam2.TrackingState.OK:
             return State.OK
-        elif self.slam.get_tracking_state() ==  orbslam2.TrackingState.LOST:
+        elif self.slam.get_tracking_state() == orbslam2.TrackingState.LOST:
             return State.LOST
-        elif self.slam.get_tracking_state() ==  orbslam2.TrackingState.NOT_INITIALIZED:
+        elif self.slam.get_tracking_state() == orbslam2.TrackingState.NOT_INITIALIZED:
             return State.NOT_INITIALIZED
-
 
     def reset(self):
         self.slam.reset()
