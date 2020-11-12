@@ -40,5 +40,15 @@ on dockerhub can be found a container with all the dipendences and the repositor
 ```
 docker pull giordanolaminetti/slampy:latest
 ```
-in the repository is also provided the Dockerfile to build your own container
+in the repository is also provided the Dockerfile to build your own container.
+to run it after the download or build, the command is
+```
+docker run -it -p 8888:8888 giordanolaminetti/slampy tmux
+```
+after the execution it will open a tumx terminal on the container.
 
+if you want to bind the container on a specific folder in your pc, you can type 
+```
+docker run -it --mount type=bind,source="$(pwd)",target=/pyslam -p 8888:8888 giordanolaminetti/slampy tmux
+```
+and change the source directory to the directory you want to bind; the example command is run on root direcotry of the repository
