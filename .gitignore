@@ -139,7 +139,7 @@ Dataset/
 .vscode
 *.csv
 .jupyter
-.local_settings
+.local
 .ipython
 .config
-
+.bash_history
