@@ -22,8 +22,7 @@ class Sensor(Enum):
 
 
 class State(Enum):
-    """
-    This class is used to get the actual state of the tracking
+    """This class is used to get the actual state of the tracking
         Values:
             OK
             LOST
@@ -35,18 +34,14 @@ class State(Enum):
 
 
 class System():
-
-    """
-    This class is a wrapper for the SLAM method in the slam_method folder,
-
-
-        Attributes:
-            params_file (str): the Path to the .yaml file.
-            sensor_type (Enum): the sensort type of the SLAM
-
+    """This class is a wrapper for the SLAM method in the slam_method folder,
     """
     def __init__(self, params_file, sensor_type):
-        
+        """ Build the wrapper
+        Args:
+            params_file (str): the Path to the .yaml file.
+            sensor_type (Enum): the sensort type of the SLAM
+        """
         # read and process the config file
         with open(params_file) as fs:
             self.params = yaml.load(fs)
@@ -58,7 +53,7 @@ class System():
     def process_image_mono(self, image, tframe):
         """ Process an image mono.
 
-        Note: it work only if the sensor type is MONOCULAR
+        Note: it works only if the sensor type is MONOCULAR
 
         Args:
             image : ndarray of the image
@@ -69,7 +64,6 @@ class System():
 
         Raises:
             Exception: if the sensor type is different from MONOCULAR
-         
         """
         self.image_shape = image.shape
         self.slam.process_image_mono(image, tframe)
@@ -78,13 +72,13 @@ class System():
         return self.get_state()
 
     def process_image_stereo(self, image_left, image_right, tframe):
-        """ Process an image stereo.
+        """ Process a stereo pair.
 
-        Note: it work only if the sensor type is STEREO
+        Note: it works only if the sensor type is STEREO
 
         Args:
-            image_left : ndarray of the left image
-            image_right : ndarray of the right image
+            image_left (ndarray) : left image as HxWx3 
+            image_right (ndarray) : right image as HxWx3
             tframe (float): the timestamp when the image was capture
 
         Returns: 
@@ -92,9 +86,8 @@ class System():
 
         Raises:
             Exception: if the sensor type is different from STEREO
-       
         """
-        self.image_shape = image.shape
+        self.image_shape = image_left.shape
         self.slam.process_image_stereo(image_left, image_right, tframe)
         if self.get_state()==State.OK:
             self.pose_array.append(self.get_pose())
@@ -103,10 +96,10 @@ class System():
     def process_image_imu_mono(self, image, tframe, imu):
         """ Process an image mono with the imu data.
 
-        Note: it work only if the sensor type is MONOCULAR_IMU
+        Note: it works only if the sensor type is MONOCULAR_IMU
 
         Args:
-            image : ndarray of the image
+            image (ndarray): image as HxWx3
             tframe (float): the timestamp when the image was capture
             imu : the imu data stored in an float array in the form of [ AccX ,AccY ,AccZ, GyroX, vGyroY, vGyroZ, Timestamp]
         
@@ -114,8 +107,7 @@ class System():
             the state of the traking in this frame
 
         Raises:
-            Exception: if the sensor type is different from MONOCULAR_IMU
-       
+            Exception: if the sensor type is different from MONOCULAR_IMU       
         """
         self.image_shape = image.shape
         self.slam.process_image_imu_mono(image, tframe, imu)
@@ -129,8 +121,8 @@ class System():
         Note: it work only if the sensor type is STEREO_IMU
 
         Args:
-            image_left : ndarray of the left image
-            image_right : ndarray of the right image
+            image_left (ndarray): left image as HxWx3
+            image_right (ndarray) : right image as HxWx3
             tframe (float): the timestamp when the image was capture
             imu : the imu data stored in an float array in the form of [ AccX ,AccY ,AccZ, GyroX, vGyroY, vGyroZ, Timestamp]
 
@@ -139,10 +131,9 @@ class System():
         
         Raises:
             Exception: if the sensor type is different from STEREO_IMU
-       
         """
-        self.image_shape = image.shape
-        self.slam.process_image_imu_stereo(image, tframe, imu)
+        self.image_shape = image_left.shape
+        self.slam.process_image_imu_stereo(image_left, image_right,tframe, imu)
         if self.get_state()==State.OK:
             self.pose_array.append(self.get_pose())
         return self.get_state()
@@ -150,10 +141,10 @@ class System():
     def process_image_rgbd(self, image, tframe):
         """ Process an  rgbd image.
 
-        Note: it work only if the sensor type is RGBD
+        Note: it works only if the sensor type is RGBD
 
         Args:
-            image : ndarray of the RGBD image
+            image (ndarray): RGBD image as HxWx4
             tframe (float): the timestamp when the image was capture
 
         Returns: 
@@ -170,18 +161,19 @@ class System():
         return self.get_state()
 
     def get_pose(self, precedent_frame=-1):
-        """ Get the frame pose between the current frame and an precedent frame in whitch we found a tracking  .
+        """ Get the frame pose between the current frame and an precedent frame in the sequence.
 
         Args:
-            precedent_frame : >0 is the number of the precedent frame to use to compute the pose between frame, if it's = -1 the precedent frame is the reference frame
+            precedent_frame : id of the frame to use when computing the pose between frame. This id must be >0, and it is relative to the current frame.
+            If it's equal to -1, the previous frame is used. Default is -1.
 
         Returns: 
-            the 4x4 pose matrix corresponding to the transormation between the two frame
+            the 4x4 pose matrix corresponding to the transormation between the current frame and the precendent one.
 
         Examples:
-            slam.get_pose() # return the pose between the reference frame and the current ones
-            slam.get_pose(precedent_frame=1) # return the pose between the current frame and the precedent onse
-            slam.get_pose(precedent_frame=2) # return the pose between the current frame and the frame states two position before
+            >>> slam.get_pose() # return the pose between the reference frame and the current ones
+            >>> slam.get_pose(precedent_frame=1) # return the pose between the current frame and the precedent one
+            >>> slam.get_pose(precedent_frame=2) # return the pose between the current frame and the frame sensed two timestamps before
    
         """
         if self.get_state()==State.OK:
