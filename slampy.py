@@ -33,6 +33,7 @@ class State(Enum):
     OK = 1
     LOST = 2
     NOT_INITIALIZED = 3
+    SYSTEM_NOT_READY = 4
 
 
 class System:
