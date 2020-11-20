@@ -9,7 +9,6 @@ cache:
   - dependencies
 
 python:
-    - "3.6"
     - "3.8"
 
 install: 
@@ -17,3 +16,6 @@ install:
 
 script:
     - python -m pytest --black ./
+
+after_script:
+    - cd docs; make html 

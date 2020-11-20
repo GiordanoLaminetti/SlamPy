@@ -30,10 +30,10 @@ def load_images_KITTI(path_to_sequence):
                     difference.seconds + difference.microseconds / 1000000
                 )
 
-    return (
-        sorted(glob.glob(os.path.join(path_to_sequence, "data", "*"))),
-        timestamps,
-    )
+    return [
+        os.path.join(path_to_sequence, "data", str(idx).zfill(10) + ".png")
+        for idx in range(len(timestamps))
+    ], timestamps
 
 
 def load_images_TUM(path_to_sequence, file_name):
