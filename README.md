@@ -44,18 +44,17 @@ We provide a container on dockerhub, in which all all the dipendences and the re
 ```
 docker pull giordanolaminetti/slampy:latest
 ```
-
-in the repository is also provided the Dockerfile to build your own container.
-to run it after the download or build, the command is
+When the image is ready, you can create a new container running:
 
 ```
-docker run -it -p 8888:8888 giordanolaminetti/slampy tmux
+NAME=
+DATAPATH="/PATH/TO/KITTI/DATE/DRIVE_SYNC_FOLDER/"
+sudo docker run -it \
+                --name $NAME \
+                --mount type=bind,source="$(pwd)",target=/pyslam \
+                -v "$DATAPATH":"/pyslam/Dataset":ro \
+                -p 8888:8888 \
+                giordanolaminetti/slampy tmux
 ```
 
-after the execution it will open a tumx terminal on the container.
-
-if you want to bind the container on a specific folder in your pc, you can type 
-```
-docker run -it --mount type=bind,source="$(pwd)",target=/pyslam -p 8888:8888 giordanolaminetti/slampy tmux
-```
-changing the  `source ` directory with the path to the directory you want to bind;
+Doing so, the created container contains both the code and the Dataset (in read-only mode to prevent wrong behaviours)
