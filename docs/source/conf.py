@@ -12,17 +12,18 @@
 #
 import os
 import sys
+
 sys.path.insert(0, os.path.abspath("../.."))
 import sphinx_theme
 
 # -- Project information -----------------------------------------------------
 
-project = 'SlampPy'
-copyright = '2020, Giordano Laminetti, Filippo Aleotti'
-author = 'Giordano Laminetti, Filippo Aleotti'
+project = "SlampPy"
+copyright = "2020, Giordano Laminetti, Filippo Aleotti"
+author = "Giordano Laminetti, Filippo Aleotti"
 
 # The full version, including alpha/beta/rc tags
-release = '1.0'
+release = "1.0"
 
 
 # -- General configuration ---------------------------------------------------
@@ -39,7 +40,7 @@ extensions = [
 napoleon_google_docstring = True
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -52,7 +53,7 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'stanford_theme'
+html_theme = "stanford_theme"
 html_theme_path = [sphinx_theme.get_html_theme_path("stanford-theme")]
 
 # Add any paths that contain custom static files (such as style sheets) here,
