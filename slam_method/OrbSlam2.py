@@ -83,7 +83,7 @@ class Slam:
             return State.LOST
         elif self.slam.get_tracking_state() == orbslam2.TrackingState.NOT_INITIALIZED:
             return State.NOT_INITIALIZED
-        elif self.slam.get_tracking_state() == orbslam2.TrackingState.SYSTEM_NOT_READY
+        elif self.slam.get_tracking_state() == orbslam2.TrackingState.SYSTEM_NOT_READY:
             return State.SYSTEM_NOT_READY
         else:
             return State.LOST
