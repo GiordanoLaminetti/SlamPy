@@ -47,12 +47,12 @@ docker pull giordanolaminetti/slampy:latest
 When the image is ready, you can create a new container running:
 
 ```
-NAME=
+NAME="orb"
 DATAPATH="/PATH/TO/KITTI/DATE/DRIVE_SYNC_FOLDER/"
 sudo docker run -it \
                 --name $NAME \
                 --mount type=bind,source="$(pwd)",target=/pyslam \
-                -v "$DATAPATH":"/pyslam/Dataset":ro \
+                -v $DATAPATH:"/pyslam/Dataset":ro \
                 -p 8888:8888 \
                 giordanolaminetti/slampy tmux
 ```
