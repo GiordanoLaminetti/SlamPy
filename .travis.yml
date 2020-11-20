@@ -17,3 +17,6 @@ install:
 
 script:
     - python -m pytest --black ./
+
+after_script:
+    - cd docs; make html 
