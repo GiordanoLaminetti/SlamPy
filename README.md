@@ -58,3 +58,9 @@ sudo docker run -it \
 ```
 
 Doing so, the created container contains both the code and the Dataset (in read-only mode to prevent wrong behaviours)
+
+You can have a test with the `jupyter` example running:
+
+```
+jupyter notebook --ip 0.0.0.0
+```
