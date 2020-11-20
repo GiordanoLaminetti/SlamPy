@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append("..")
 from slampy import Sensor
 from slampy import State
@@ -6,35 +7,34 @@ import orbslam2
 import os.path
 
 
-class Slam():
+class Slam:
     def __init__(self, params, sensor_type):
-        config_file = params['SLAM.settings_path']
-        vocab_file = params['SLAM.vocab_path']
+        config_file = params["SLAM.settings_path"]
+        vocab_file = params["SLAM.vocab_path"]
 
         # check the existence of the configuration file
 
         if not os.path.exists(config_file):
-            raise FileNotFoundError(config_file+" not found")
+            raise FileNotFoundError(config_file + " not found")
 
         if not os.path.exists(vocab_file):
-            raise FileNotFoundError(vocab_file+" not found")
+            raise FileNotFoundError(vocab_file + " not found")
 
         # ORB_Slam2 don't have the imu interfaces so the STEREO_IMU and
         # MONOCULAR_IMU are mapped in the STEREO and MONOCULAR sensor
         if sensor_type == Sensor.MONOCULAR or sensor_type == Sensor.MONOCULAR_IMU:
-            print('the input sensor select is MONOCULAR')
+            print("the input sensor select is MONOCULAR")
             self.slam = orbslam2.System(
-                vocab_file, config_file, orbslam2.Sensor.MONOCULAR)
+                vocab_file, config_file, orbslam2.Sensor.MONOCULAR
+            )
             self.sensor_type = Sensor.MONOCULAR
         if sensor_type == Sensor.STEREO or sensor_type == Sensor.STEREO_IMU:
-            print('the input sensor select is STEREO')
-            self.slam = orbslam2.System(
-                vocab_file, config_file, orbslam2.Sensor.STEREO)
+            print("the input sensor select is STEREO")
+            self.slam = orbslam2.System(vocab_file, config_file, orbslam2.Sensor.STEREO)
             self.sensor_type = Sensor.STEREO
         if sensor_type == Sensor.RGBD:
-            print('the input sensor select is RGBD')
-            self.slam = orbslam2.System(
-                vocab_file, config_file, orbslam2.Sensor.RGBD)
+            print("the input sensor select is RGBD")
+            self.slam = orbslam2.System(vocab_file, config_file, orbslam2.Sensor.RGBD)
             self.sensor_type = sensor_type
         self.slam.set_use_viewer(False)
         self.slam.initialize()
