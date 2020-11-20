@@ -3,7 +3,7 @@
 ![Python version](https://img.shields.io/badge/python-python%203.8-brightgreen) [![Build Status](https://travis-ci.com/GiordanoLaminetti/SlamPy.svg?branch=master)](https://travis-ci.com/GiordanoLaminetti/SlamPy) [![Documentation Status](https://readthedocs.org/projects/slampy/badge/?version=latest)](https://slampy.readthedocs.io/en/latest/?badge=latest)
 
 
-This project is a python wrapper to aribtrary SLAM alogirthms.
+This project is a python wrapper to SLAM algorithms.
 
 At the moment, we provide support for:
 
@@ -16,7 +16,7 @@ Python wrapper to ORB SLAM 2 can be found at [ORB_SLAM2-PythonBindings](https://
 
 ## Example of usage with ORB_SLAM2
 
-the jupyter notebooks **example_usage** show and example of usage with ORB_SLAM2 with a KITTI dataset, the dataset can be found at this [link](http://www.cvlibs.net/datasets/kitti/raw_data.php)
+the jupyter notebook **example_usage** shows how to use ORB_SLAM2 with a sequence of the KITTI dataset
 
 ## Change the settings
 
@@ -32,9 +32,9 @@ to change from ORB_SLAM2 to ORB_SLAM3 you need to change only the **SLAM.alg** e
 the params needed for this 2 algorithms are:
 
 * a vocabulary file
-* a setting file with the intrisec parameters of the cameras and the other configuration params
+* a setting file with the intrinsics parameters of the cameras and other configuration params
 
-in this repository is provided the vocabulary file and the configuration file for ORB_SLAM2/3 for the KITTI_02 camera and the TUM freiburg3 camera in the **slam_metohd/Settings** folder, but you can add your owns using as model the files currently provided.
+We provided the vocabulary file and the configuration file for ORB_SLAM2/3 for the KITTI_02 camera and the TUM freiburg3 camera in the **slam_metohd/Settings** folder, but you can add your owns using as model the files currently provided.
 
 
 ### Docker
