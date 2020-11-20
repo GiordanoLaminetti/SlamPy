@@ -38,8 +38,14 @@ We provided the vocabulary file and the configuration file for ORB_SLAM2/3 for t
 We provide a container on dockerhub, in which all all the dipendences and the repository are already installed. 
 
 ```
-docker pull giordanolaminetti/slampy:latest
+docker pull giordanolaminetti/slampy:tag
 ```
+The `tag` correspond to the container you need:
+* `base` correspond to a container with installed only the dependences
+* `orbslam2` correspond to a container with only ORB_SLAM2 installed
+* `orbslam3` correspond to a container with only ORB_SLAM2 installed
+* `latest` correspond to a container with ORB_SLAM2 and ORB_SLAM3 installed
+
 When the image is ready, you can create a new container running:
 
 ```
@@ -47,10 +53,10 @@ NAME="orb"
 DATAPATH="/PATH/TO/KITTI/DATE/DRIVE_SYNC_FOLDER/"
 sudo docker run -it \
                 --name $NAME \
-                --mount type=bind,source="$(pwd)",target=/pyslam \
-                -v $DATAPATH:"/pyslam/Dataset":ro \
+                --mount type=bind,source="$(pwd)",target=/slampy/slampy \
+                -v $DATAPATH:"/slampy/slampy/Dataset":ro \
                 -p 8888:8888 \
-                giordanolaminetti/slampy tmux
+                giordanolaminetti/slampy:tag tmux
 ```
 
 Doing so, the created container contains both the code and the Dataset (in read-only mode to prevent wrong behaviours)
