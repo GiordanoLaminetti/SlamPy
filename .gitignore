@@ -143,3 +143,5 @@ Dataset/
 .ipython
 .config
 .bash_history
+
+results/**

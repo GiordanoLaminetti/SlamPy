@@ -16,6 +16,8 @@ def run(args):
     setting_file = args.settings
     if not os.path.exists(setting_file):
         raise ValueError(f"Cannot find setting file at {setting_file}")
+    if args.pose_id < -1:
+        raise ValueError(f"Pose index must be -1 or >0")
 
     app = slampy.System(setting_file, slampy.Sensor.MONOCULAR)
 
@@ -54,7 +56,10 @@ def run(args):
             depth_path = os.path.join(dest_depth, name)
             save_depth(depth_path, depth)
 
-            # NOTE: add code to dump the pose
+            pose_path = os.path.join(dest_pose, name)
+            pose_past_frame_to_current = app.get_pose(precedent_frame=args.pose_id)
+            save_pose(pose_path, pose_past_frame_to_current)
+
             pbar.update(1)
 
     # NOTE: final dump of log.txt file
@@ -73,6 +78,14 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--dest", type=str, default="results", help="where do we save artefacts?"
+    )
+    parser.add_argument(
+        "--pose_id",
+        type=int,
+        default=1,
+        help="between which frames do you want compute the pose? If pose_id==-1, get the pose between 0->T; \
+            if pose_id >0, compute the pose between T-pose_id->T \
+            For instance, if pose_id=2 then compute the pose between T-2->T",
     )
 
     args = parser.parse_args()
