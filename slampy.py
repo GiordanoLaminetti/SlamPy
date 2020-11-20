@@ -46,7 +46,7 @@ class System:
         """
         # read and process the config file
         with open(params_file) as fs:
-            self.params = yaml.load(fs)
+            self.params = yaml.safe_load(fs)
 
         module = importlib.import_module("slam_method." + self.params["SLAM.alg"])
         self.slam = module.Slam(self.params, sensor_type)
