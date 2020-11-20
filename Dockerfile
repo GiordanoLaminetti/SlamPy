@@ -130,10 +130,8 @@ RUN if [ ! -L "/usr/lib/x86_64-linux-gnu/libboost_python-py35.so" ]; then \
  								ln -s /usr/lib/x86_64-linux-gnu/libboost_python-py36.so \
 								/usr/lib/x86_64-linux-gnu/libboost_python-py35.so ; fi
 RUN	apt-get update ; apt-get -y install libeigen3-dev
-RUN if [ ! -e "/usr/include/eigen3/Eigen" ]; then\
+RUN if [ ! -L "/usr/local/include/Eigen" ]; then\
 			ln -s /usr/include/eigen3/Eigen /usr/local/include/Eigen ; fi
-RUN ls /usr/local/include
-RUN ls /usr/local/include/Eigen
 RUN mkdir $Orb_Slam2_PB_Path
 RUN if $build_orbslam2 ; then \
 				git clone https://github.com/GiordanoLaminetti/ORB_SLAM2-PythonBindings.git \
