@@ -164,25 +164,33 @@ class System:
         return self.get_state()
 
     def get_pose(self, precedent_frame=-1):
-        """Get the frame pose between the current frame and an precedent frame in the sequence.
+        """Get the frame pose between a previous frame in the sequence and the current one.
+        Our aim is to compute the pose between a frame X and the current one T, i.e. X->T.
+        The param precedent_frame allows to distinguish between different situations:
+        * if precedent_frame=-1, then X is the first frame of the sequence. We get the pose between 0->T
+        * if precedent_frame > 0, then X is T-precedent_frame. For instance, if precedent_frame=1, it means we are computing the
+        pose between T-1 -> T.
 
         Args:
-            precedent_frame : id of the frame to use when computing the pose between frame. This id must be >0, and it is relative to the current frame.
-            If it's equal to -1, the previous frame is used. Default is -1.
+            precedent_frame : id of the frame to use when computing the pose between frame. Default is -1 (i.e., pose 0->T)
 
         Returns:
-            the 4x4 pose matrix corresponding to the transormation between the current frame and the precendent one.
+            the 4x4 pose matrix corresponding to the transormation between the precedent_frame and the current one.
+
 
         Examples:
-            >>> slam.get_pose() # return the pose between the reference frame and the current ones
-            >>> slam.get_pose(precedent_frame=1) # return the pose between the current frame and the precedent one
-            >>> slam.get_pose(precedent_frame=2) # return the pose between the current frame and the frame sensed two timestamps before
+            >>> slam.get_pose() # return the pose between the reference frame (frame 0 in the sequence) and the current one
+            >>> slam.get_pose(precedent_frame=1) # return the pose between the previous frame and the current one
+            >>> slam.get_pose(precedent_frame=2) # return the pose between the frame at 2 timestamps ago and the current one
 
         """
         if self.get_state() == State.OK:
             if precedent_frame <= 0:
                 return self.slam.get_pose()
             else:
+                # get_pose = pose 0->T
+                # inv(0->T-precedent_frame) = pose T-precedent_frame to 0
+                # pose T-precedent_frame->T = 0->T * (T-1 -> 0)
                 return np.dot(
                     self.slam.get_pose(),
                     np.linalg.inv(self.pose_array[-precedent_frame]),
