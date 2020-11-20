@@ -1,8 +1,6 @@
 # SlamPy
 
-![Python version](https://img.shields.io/badge/python-python%203.8-brightgreen)
-
-This project is a python wrapper to aribtrary SLAM alogirthms.
+![Python version](https://img.shields.io/badge/python-python%203.8-brightgreen) [![Build Status](https://travis-ci.com/GiordanoLaminetti/SlamPy.svg?branch=master)](https://travis-ci.com/GiordanoLaminetti/SlamPy)This project is a python wrapper to aribtrary SLAM alogirthms.
 
 At the moment, we provide support for:
 
