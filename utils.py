@@ -3,6 +3,7 @@ import time
 import numpy as np
 import os
 import glob
+import cv2
 from PIL import Image
 
 
@@ -48,7 +49,6 @@ def load_images_TUM(path_to_sequence, file_name):
     """
     timestamps = []
     rgb_filenames = []
-    t0 = None
     with open(os.path.join(path_to_sequence, file_name)) as times_file:
         for line in times_file:
             if len(line) > 0 and not line.startswith("#"):
@@ -172,3 +172,41 @@ def read_depth_TUM(filename):
 
     depth = (depth_png.astype(np.float) / 256) / 5000.0
     return depth
+
+
+def create_dir(directory):
+    """Create a directory if not exists
+    Args:
+        directory: directory to create
+    Returns:
+        None, but it creates a new folder if not exists
+    """
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+
+def save_depth(dest, depth):
+    """Save depth as 16 bit png file
+
+    Args:
+        dest: path to new 16 bit png image wiht depth, w/o exension
+        depth: depth to save, as ndarray HxW
+
+    Returns:
+        None, but a new 16 bit png image will be saved at dest
+    """
+    cv2.imwrite(f"{dest}.png", (depth * 256).astype(np.uint16))
+
+
+def save_pose(dest, pose):
+    """Save pose as npy file
+
+    Args:
+        dest: path to new npy file wiht pose, w/o exension
+        pose: ndarray with 4x4 pose matrix (as R|t in homogeneous notation)
+
+    Returns:
+        None, but it creates a new npy file with the pose
+    """
+
+    np.save(f"{dest}.npy", pose)
