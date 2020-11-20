@@ -10,10 +10,6 @@ At the moment, we provide support for:
 * ORB_SLAM2
 * ORB_SLAM3
 
-## ORB_SLAM2 / ORB_SLAM3 requirement
-
-Python wrapper to ORB SLAM 2 can be found at [ORB_SLAM2-PythonBindings](https://github.com/GiordanoLaminetti/ORB_SLAM2-PythonBindings) for ORB_SLAM2 and [ORB_SLAM3-PythonBindings](https://github.com/GiordanoLaminetti/ORB_SLAM2-PythonBindings/tree/ORBSLAM3) for ORB_SLAM3
-
 ## Example of usage with ORB_SLAM2
 
 the jupyter notebook **example_usage** shows how to use ORB_SLAM2 with a sequence of the KITTI dataset
@@ -64,3 +60,9 @@ You can have a test with the `jupyter` example running:
 ```
 jupyter notebook --ip 0.0.0.0
 ```
+
+## Credits:
+Our project has been developed starting from other repositories, in particular:
+* Python bindings to ORB Slam are based on the [repo](https://github.com/jskinn/ORB_SLAM2-PythonBindings)
+* ORB Slam 2 has been cloned from [the original repository](https://github.com/raulmur/ORB_SLAM2)
+* ORB Slam 3 has been cloned from [the original repository](https://github.com/UZ-SLAMLab/ORB_SLAM3)
