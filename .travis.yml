@@ -19,3 +19,6 @@ script:
 
 after_script:
     - cd docs; make html 
+
+notifications:
+  email: false
