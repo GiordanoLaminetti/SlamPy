@@ -151,7 +151,7 @@ class System:
             tframe (float): the timestamp when the image was capture
 
         Returns:
-            the state of the traking in this frame
+            the new state of the SLAM system
 
         Raises:
             Exception: if the sensor type is different from RGBD
@@ -176,6 +176,7 @@ class System:
 
         Returns:
             the 4x4 pose matrix corresponding to the transormation between the precedent_frame and the current one.
+            If the state is not State.OK, return None
 
 
         Examples:
@@ -195,6 +196,7 @@ class System:
                     self.slam.get_pose(),
                     np.linalg.inv(self.pose_array[-precedent_frame]),
                 )
+        return None
 
     def get_abs_cloud(self):
         """Get the point cloud at the current frame stored in it's aboslute coordinate .
@@ -205,6 +207,7 @@ class System:
         """
         if self.get_state() == State.OK:
             return self.slam.get_abs_cloud()
+        return None
 
     def get_point_cloud(self):
         """Get the point cloud at the current frame form the wiev of the current position .
@@ -215,6 +218,7 @@ class System:
         """
         if self.get_state() == State.OK:
             return [cp for (cp, _) in self._get_2d_point()]
+        return None
 
     def get_depth(self):
         """Get the depth computed in the current image.
@@ -223,17 +227,18 @@ class System:
             an array of the image shape with depth when it is aviable otherwise -1 , None if the traking is failed
 
         """
+        depth = None
         if self.get_state() == State.OK:
             depth = np.ones(self.image_shape[0:2]) * -1
             for (cp, point) in self._get_2d_point():
                 depth[point[1], point[0]] = cp[2]
-            return depth
+        return depth
 
     def _get_2d_point(self):
         """This private method is used to compute the transormation between the absolute point to the image point
 
         Return:
-            an array of pair (camera view, image point) , None if the traking is failed
+            an array of pair (camera view, image point) , an empty list if the traking is failed
 
         """
         points2D = []
@@ -258,7 +263,7 @@ class System:
         return points2D
 
     def get_state(self):
-        """Return the state of the SLAM tracking in the last frame
+        """Get the current state of the SLAM system
 
         Returns:
             an State enums corresponding to the state
@@ -266,9 +271,9 @@ class System:
         return self.slam.get_state()
 
     def shutdown(self):
-        """Shutdown the SLAM algorithm"""
+        """Shutdown the SLAM system"""
         self.slam.shutdown()
 
     def reset(self):
-        """Reset SLAM algorithm"""
+        """Reset SLAM system"""
         self.slam.reset()
