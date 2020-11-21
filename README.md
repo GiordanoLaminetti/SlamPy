@@ -1,6 +1,6 @@
 # SlamPy
 
-![Python version](https://img.shields.io/badge/python-python%203.8-brightgreen) [![Build Status](https://travis-ci.com/GiordanoLaminetti/SlamPy.svg?branch=master)](https://travis-ci.com/GiordanoLaminetti/SlamPy) [![Documentation Status](https://readthedocs.org/projects/slampy/badge/?version=latest)](https://slampy.readthedocs.io/en/latest/?badge=latest) ![Docker Cloud Automated build](https://img.shields.io/docker/cloud/automated/giordanolaminetti/slampy)
+![Python version](https://img.shields.io/badge/python-python%203.8-brightgreen) [![Build Status](https://travis-ci.com/GiordanoLaminetti/SlamPy.svg?branch=master)](https://travis-ci.com/GiordanoLaminetti/SlamPy) [![Documentation Status](https://readthedocs.org/projects/slampy/badge/?version=latest)](https://slampy.readthedocs.io/en/latest/?badge=latest)
 
 
 This project is a python wrapper to SLAM algorithms.
