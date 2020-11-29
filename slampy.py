@@ -70,6 +70,7 @@ class System:
         """
         self.image_shape = image.shape
         self.slam.process_image_mono(image, tframe)
+        self.image = image
         if self.get_state() == State.OK:
             self.pose_array.append(self.get_pose())
         return self.get_state()
@@ -92,6 +93,7 @@ class System:
         """
         self.image_shape = image_left.shape
         self.slam.process_image_stereo(image_left, image_right, tframe)
+        self.image = image
         if self.get_state() == State.OK:
             self.pose_array.append(self.get_pose())
         return self.get_state()
@@ -114,6 +116,7 @@ class System:
         """
         self.image_shape = image.shape
         self.slam.process_image_imu_mono(image, tframe, imu)
+        self.image = image
         if self.get_state() == State.OK:
             self.pose_array.append(self.get_pose())
         return self.get_state()
@@ -137,6 +140,7 @@ class System:
         """
         self.image_shape = image_left.shape
         self.slam.process_image_imu_stereo(image_left, image_right, tframe, imu)
+        self.image = image
         if self.get_state() == State.OK:
             self.pose_array.append(self.get_pose())
         return self.get_state()
@@ -159,6 +163,7 @@ class System:
         """
         self.image_shape = image.shape
         self.slam.process_image_rgbd(image, tframe)
+        self.image = image
         if self.get_state() == State.OK:
             self.pose_array.append(self.get_pose())
         return self.get_state()
@@ -198,6 +203,12 @@ class System:
                 )
         return None
 
+    def get_pose_inverse(self):
+        """Get the inverse frame pose between the frame 0 and the current one."""
+        if self.get_state() == State.OK:
+            return np.linalg.inv(self.slam.get_pose())
+        return None
+
     def get_abs_cloud(self):
         """Get the point cloud at the current frame stored in it's aboslute coordinate .
 
@@ -218,6 +229,20 @@ class System:
         """
         if self.get_state() == State.OK:
             return [cp for (cp, _) in self._get_2d_point()]
+        return None
+
+    def get_point_cloud_colored(self):
+        """Get the point cloud at the current frame form the wiev of the current position with the RGB color of the point .
+
+        Return:
+            an array with the 3D coordinate of the point and the relative RGB color, None if the traking is failed
+
+        """
+        if self.get_state() == State.OK:
+            return [
+                [cp, self.image[point[1], point[0]]]
+                for (cp, point) in self._get_2d_point()
+            ]
         return None
 
     def get_depth(self):
@@ -244,7 +269,7 @@ class System:
         points2D = []
         points = self.get_abs_cloud()
         camera_matrix = self.slam.get_camera_matrix()
-        pose = self.get_pose()
+        pose = self.get_pose_inverse()
         for point in points:
             point = np.append(point, [1]).reshape(4, 1)
             camera_points = np.dot(pose, point)
@@ -261,6 +286,14 @@ class System:
                 if int(u) in range(0, self.image_shape[1]):
                     points2D.append([camera_points, (int(u), int(v))])
         return points2D
+
+    def get_camera_matrix(self):
+        """Get the instrinsec parameter of camera
+
+        Returns:
+            the camera matrix
+        """
+        return self.slam.get_camera_matrix()
 
     def get_state(self):
         """Get the current state of the SLAM system

@@ -1,6 +1,7 @@
 import orbslam3
 import sys
 import os.path
+import numpy as np
 
 sys.path.append("..")
 from slampy import State
@@ -85,7 +86,7 @@ class Slam:
 
     def get_pose(self):
         if self.slam.get_tracking_state() == orbslam3.TrackingState.OK:
-            return self.slam.get_frame_pose()
+            return np.linalg.inv(self.slam.get_frame_pose())
 
     def get_abs_cloud(self):
         if self.slam.get_tracking_state() == orbslam3.TrackingState.OK:

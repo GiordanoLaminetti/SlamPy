@@ -143,5 +143,5 @@ Dataset/
 .ipython
 .config
 .bash_history
-
+docker_build.sh
 results/**
