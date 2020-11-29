@@ -20,7 +20,7 @@ RUN if $build_dependences ; then \
 																									qemu gcc-aarch64-linux-gnu \
 																									libboost-all-dev libpcap-dev libssl-dev; \
 				python3 -mpip install numpy pyopengl Pillow pybind11 jupyter matplotlib \
-															pandas pyyaml ; fi
+															pandas pyyaml plotly; fi
 
 
 # Pangolin installation
