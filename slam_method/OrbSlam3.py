@@ -74,7 +74,9 @@ class Slam:
 
     def process_image_imu_stereo(self, image_left, image_right, tframe, imu):
         if self.sensor_type == Sensor.STEREO_IMU:
-            self.slam.process_image_imu_stereo(image, tframe, imu, "0")
+            self.slam.process_image_imu_stereo(
+                image_left, image_right, tframe, imu, "0"
+            )
         else:
             raise Exception("The sensor type is not STREO_IMU")
 
@@ -102,7 +104,7 @@ class Slam:
             return State.LOST
         elif self.slam.get_tracking_state() == orbslam3.TrackingState.NOT_INITIALIZED:
             return State.NOT_INITIALIZED
-        elif self.slam.get_tracking_state() == orbslam2.TrackingState.SYSTEM_NOT_READY:
+        elif self.slam.get_tracking_state() == orbslam3.TrackingState.SYSTEM_NOT_READY:
             return State.SYSTEM_NOT_READY
         else:
             return State.LOST
