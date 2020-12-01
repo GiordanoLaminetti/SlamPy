@@ -4,6 +4,13 @@
 
 This project is a python wrapper to SLAM algorithms.
 
+<p align="center">
+	<img src="assets/SLAM.gif" />
+</p>
+<p align="center">
+	<img src="assets/Trajctory.gif" />
+</p>
+
 At the moment, we provide support for:
 
 - ORB_SLAM2
