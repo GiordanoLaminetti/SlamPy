@@ -45,6 +45,7 @@ templates_path = ["_templates"]
 
 # Add docstring of __init__ methods and class method
 autoclass_content = "both"
+master_doc = "index"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
