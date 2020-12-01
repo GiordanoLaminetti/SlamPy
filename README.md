@@ -4,12 +4,10 @@
 
 This project is a python wrapper to SLAM algorithms.
 
-<p align="center">
-	<img src="assets/SLAM.gif" />
-</p>
-<p align="center">
-	<img src="assets/Trajctory.gif" />
-</p>
+<p float="center">
+    <img src="assets/SLAM.gif" width='70%'/>
+    <img src="assets/Trajectory.gif" width='25%'  />
+</p>	
 
 At the moment, we provide support for:
 
