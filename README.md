@@ -5,10 +5,10 @@
 This project is a python wrapper to SLAM algorithms.
 
 <p float="center">
-    <img src="assets/SLAM.gif" width='70%'/>
-    <img src="assets/Trajectory.gif" width='25%'  />
-</p>	
+    <img src="assets/SLAM.gif" width='100%'/>
+</p>
 
+	
 At the moment, we provide support for:
 
 - ORB_SLAM2
@@ -26,6 +26,10 @@ to change the algorithm settings you can modify the **setting.yaml** file in the
 
 you can add at the file the other params that the method needs.
 to change from ORB_SLAM2 to ORB_SLAM3 you need to change only the **SLAM.alg** entry.
+
+<p float="center">
+     <img src="assets/Trajectory.gif" width='100%' height="500" />
+</p>
 
 ### ORB_SLAM2/3 params
 
