@@ -39,7 +39,7 @@ class TrajectoryDrawer:
             height(int): the height of figure in pixel. Defaults to None
             point_size (int): the size of the marker point in pixel. Defauts to 2
             drawpointcloud (bool): if is false the plot show only trajectory and not the point cloud. Defaults to True
-            useFigureWidget (bool): use the plotily.graph_object.FigureWidget istance if false it used a plotily.graph_object.Figure
+            useFigureWidget (bool): use the plotily.graph_object.FigureWidget instance if false it used the plotily.graph_object.Figure
         """
         self.eye_x = eye_x
         self.eye_y = eye_y
@@ -52,7 +52,7 @@ class TrajectoryDrawer:
         self.point_size = point_size
         self.drawpointcloud = drawpointcloud
         # initialize the figure
-        if useFigureWidget:
+        if useFigureWidget == True:
             self.figure = go.FigureWidget()
         else:
             self.figure = go.Figure()
