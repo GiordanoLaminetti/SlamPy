@@ -7,5 +7,5 @@ SlamPy
    :caption: Get Started
 
    introduction
-
+   modules
 .. bibliography:: references.bib
