@@ -74,7 +74,7 @@ def compute_errors(gt, pred):
     """Computation of error metrics between predicted and ground truth depths
     """
     thresh = np.maximum((gt / pred), (pred / gt))
-    a1 = (thresh < 1.25     ).mean()
+    a1 = (thresh < 1.25).mean()
     a2 = (thresh < 1.25 ** 2).mean()
     a3 = (thresh < 1.25 ** 3).mean()
 
@@ -89,7 +89,6 @@ def compute_errors(gt, pred):
     sq_rel = np.mean(((gt - pred) ** 2) / gt)
 
     return abs_rel, sq_rel, rmse, rmse_log, a1, a2, a3
-
 
 
 def convert_scale(points, gt_depth):
@@ -232,20 +231,20 @@ def save_pose_txt(args, name, pose):
         None, but it creates a new npy file with the pose
     """
     pose_file_path = os.path.join(args.dest, "pose.txt")
-    fp = open(pose_file_path, 'a')
+    fp = open(pose_file_path, "a")
     pose34 = pose[:3]
 
     fp.write(name)
     for row in pose34:
         fp.write(" ")
         fp.write(" ".join(str(round(i, 10)) for i in row))
-    #fp.write('\n')
-    fp.write('\n')
+    # fp.write('\n')
+    fp.write("\n")
     fp.close()
 
+
 def evaluate_pose(args):
-    """Evaluate odometry on the KITTI dataset
-    """
+    """Evaluate odometry on the KITTI dataset"""
     orb_pose_dir = os.path.join(args.dest, "pose")
     pred_poses = []
     gt_local_poses = []
@@ -253,22 +252,26 @@ def evaluate_pose(args):
     for count, dir_name in enumerate(sorted(os.listdir(orb_pose_dir))):
         fileId = os.path.splitext(dir_name)[0]
         id = fileId.zfill(6)
-        pose_file = os.path.join(orb_pose_dir, '{}.npy'.format(id))
+        pose_file = os.path.join(orb_pose_dir, "{}.npy".format(id))
         pred_poses.append(np.load(pose_file))
 
-        gt_pose_file = os.path.join(args.gt_pose_dir, '{}.npy'.format(id))
+        gt_pose_file = os.path.join(args.gt_pose_dir, "{}.npy".format(id))
         gt_local_poses.append(np.load(gt_pose_file))
 
     num_frames = len(gt_local_poses)
     track_length = 5
-    for i in range(0, num_frames-track_length-1):
-        if i == num_frames -track_length-2:
+    for i in range(0, num_frames - track_length - 1):
+        if i == num_frames - track_length - 2:
             print("break")
-        local_xyzs = np.array(dump_xyz(pred_poses[i:i + track_length - 1]))
-        gt_local_xyzs = np.array(dump_xyz(gt_local_poses[i:i + track_length - 1]))
+        local_xyzs = np.array(dump_xyz(pred_poses[i : i + track_length - 1]))
+        gt_local_xyzs = np.array(dump_xyz(gt_local_poses[i : i + track_length - 1]))
         ates.append(compute_ate(gt_local_xyzs, local_xyzs))
 
-    print("\n   Trajectory error: {:0.3f}, std: {:0.3f}\n".format(np.mean(ates), np.std(ates)))
+    print(
+        "\n   Trajectory error: {:0.3f}, std: {:0.3f}\n".format(
+            np.mean(ates), np.std(ates)
+        )
+    )
 
 
 # from https://github.com/tinghuiz/SfMLearner
@@ -292,27 +295,37 @@ def compute_ate(gtruth_xyz, pred_xyz_o):
     pred_xyz = pred_xyz_o + offset[None, :]
 
     # Optimize the scaling factor
-    scale = np.sum(gtruth_xyz * pred_xyz) / (np.sum(pred_xyz ** 2)+0.00001)
+    scale = np.sum(gtruth_xyz * pred_xyz) / (np.sum(pred_xyz ** 2) + 0.00001)
     alignment_error = pred_xyz * scale - gtruth_xyz
     rmse = np.sqrt(np.sum(alignment_error ** 2)) / gtruth_xyz.shape[0]
     return rmse
 
 
-def save_depth_err_results(file_path,filename, err):
-    f = open(file_path, 'a+')
-    print('----------------------------------------------')
-    print('image id:{}'.format(filename))
-    print("\n  " + ("{:>8} | " * 7).format("abs_rel", "sq_rel", "rmse", "rmse_log", "a1", "a2", "a3"))
+def save_depth_err_results(file_path, filename, err):
+    f = open(file_path, "a+")
+    print("----------------------------------------------")
+    print("image id:{}".format(filename))
+    print(
+        "\n  "
+        + ("{:>8} | " * 7).format(
+            "abs_rel", "sq_rel", "rmse", "rmse_log", "a1", "a2", "a3"
+        )
+    )
     print(("&{: 8.3f}  " * 7).format(*err) + "\\\\")
 
-    f.writelines('----------------------------------------------\n')
-    f.writelines('image id:{}'.format(filename))
+    f.writelines("----------------------------------------------\n")
+    f.writelines("image id:{}".format(filename))
     f.writelines(
-        "\n  " + ("{:>8} | " * 7).format("abs_rel", "sq_rel", "rmse", "rmse_log", "a1", "a2", "a3"))
+        "\n  "
+        + ("{:>8} | " * 7).format(
+            "abs_rel", "sq_rel", "rmse", "rmse_log", "a1", "a2", "a3"
+        )
+    )
     f.writelines("\n")
     f.writelines(("&{: 8.3f}  " * 7).format(*err) + "\\\\")
     f.writelines("\n")
     return
+
 
 def get_error(args, filename, points, gt_filename):
     """Get the realtive gt from it's filename and convert the scale of the predictions in order to compute the error
@@ -325,13 +338,13 @@ def get_error(args, filename, points, gt_filename):
         the error computed on this examples
     """
     MIN_DEPTH = 1e-3
-    if args.data_type=='KITTI_VO':
+    if args.data_type == "KITTI_VO":
         MAX_DEPTH = 100
         gt_depth = cv2.imread(gt_filename, -1) / 256
         if gt_depth is None:
             print("gt path err {}".gt_filename)
             return None
-    elif args.data_type=='TUM':
+    elif args.data_type == "TUM":
         MAX_DEPTH = 10
         gt_depth = (cv2.imread(gt_filename, -1) / 256) / 5000.0
         if gt_depth is None:
@@ -360,6 +373,7 @@ def get_error(args, filename, points, gt_filename):
 
     return err
 
+
 def load_images_KITTI_VO(path_to_sequence):
     """Return the sequence of the images found in the path and the corrispondent timestamp
 
@@ -381,6 +395,7 @@ def load_images_KITTI_VO(path_to_sequence):
         for idx in range(len(timestamps))
     ], timestamps
 
+
 def load_images_TUM(path_to_sequence, file_name):
     """Return the sequence of the images found in the path and the corrispondent timestamp
 
@@ -401,4 +416,3 @@ def load_images_TUM(path_to_sequence, file_name):
                 timestamps.append(float(t))
 
     return [os.path.join(path_to_sequence, name) for name in rgb_filenames], timestamps
-

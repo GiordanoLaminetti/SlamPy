@@ -24,9 +24,9 @@ def run(args):
 
     # TODO: generic loader an not KITTI one
 
-    if args.data_type =="TUM":
-        image_filenames, timestamps =load_images_TUM(args.dataset,"rgb.txt")
-    elif args.data_type =="KITTI_VO":
+    if args.data_type == "TUM":
+        image_filenames, timestamps = load_images_TUM(args.dataset, "rgb.txt")
+    elif args.data_type == "KITTI_VO":
         image_filenames, timestamps = load_images_KITTI_VO(args.dataset)
     num_images = len(image_filenames)
 
@@ -39,11 +39,10 @@ def run(args):
     states = []
     errors = []
 
-
     with tqdm(total=num_images) as pbar:
         for idx, image_name in enumerate(image_filenames):
             # TODO: it is image loader duty to provide correct images
-            #image_name = image_name.replace(".png", ".jpg")
+            # image_name = image_name.replace(".png", ".jpg")
             image = cv2.imread(image_name)
             if image is None:
                 raise ValueError(f"failed to load image {image_name}")
@@ -65,10 +64,10 @@ def run(args):
 
                 curr_pose = app.get_pose(-1)
                 if curr_pose is not None:
-                    save_pose_txt(args,name,curr_pose)
+                    save_pose_txt(args, name, curr_pose)
 
                 if args.is_evalute_depth:
-                    gt_file_path = os.path.join(args.gt_depth, '{}.png'.format(name))
+                    gt_file_path = os.path.join(args.gt_depth, "{}.png".format(name))
                     err = get_error(args, name, depth, gt_file_path)
                     errors.append(err)
 
@@ -77,8 +76,7 @@ def run(args):
 
         mean_errors = np.array(errors).mean(0)
         save_results = os.path.join(args.dest, "results.txt")
-        save_depth_err_results(save_results,"mean values",mean_errors)
-
+        save_depth_err_results(save_results, "mean values", mean_errors)
 
     # NOTE: final dump of log.txt file
     with open(os.path.join(args.dest, "log.txt"), "w") as f:
@@ -92,18 +90,28 @@ def run(args):
         eval_tool.eval(args)
 
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Run the SLAM system and save, at each frame, the current depth and pose"
     )
 
-    parser.add_argument("--dataset", type=str, default="/media/Datasets/KITTI_VO/dataset/sequences/10", help="path to dataset")
     parser.add_argument(
-        "--settings", type=str, default="./settings_kitty.yaml", help="which configuration?"
+        "--dataset",
+        type=str,
+        default="/media/Datasets/KITTI_VO/dataset/sequences/10",
+        help="path to dataset",
     )
     parser.add_argument(
-        "--dest", type=str, default="./results_kitty_vo_10", help="where do we save artefacts?"
+        "--settings",
+        type=str,
+        default="./settings_kitty.yaml",
+        help="which configuration?",
+    )
+    parser.add_argument(
+        "--dest",
+        type=str,
+        default="./results_kitty_vo_10",
+        help="where do we save artefacts?",
     )
     parser.add_argument(
         "--pose_id",
@@ -117,51 +125,64 @@ if __name__ == "__main__":
         "--is_evalute_depth",
         default=True,
         action="store_true",
-        help="If set, will evalute the orb depth with the gt files ")
+        help="If set, will evalute the orb depth with the gt files ",
+    )
 
     parser.add_argument(
         "--is_evalute_pose",
         default=True,
         action="store_true",
-        help="If set, will evalute the orb pose with the gt files")
+        help="If set, will evalute the orb pose with the gt files",
+    )
 
     parser.add_argument(
         "--is_bash",
-        #default=True,
+        # default=True,
         action="store_true",
-        help="If set, means use bash shell to evaluate")
+        help="If set, means use bash shell to evaluate",
+    )
 
-    parser.add_argument("--data_type",
-                        type=str,
-                        help="which dataset type",
-                        default='KITTI_VO',
-                        choices=['TUM', 'KITTI_VO', 'KITTI'])
+    parser.add_argument(
+        "--data_type",
+        type=str,
+        help="which dataset type",
+        default="KITTI_VO",
+        choices=["TUM", "KITTI_VO", "KITTI"],
+    )
 
-    parser.add_argument("--gt_depth",
-                        type=str,
-                        help="the gt depth files of the dataset",
-                        default="/media/Datasets/KITTI_VO_SGM/10/depth")
-                        #/media/Datasets/TUM/freiburg3_convert/depth
+    parser.add_argument(
+        "--gt_depth",
+        type=str,
+        help="the gt depth files of the dataset",
+        default="/media/Datasets/KITTI_VO_SGM/10/depth",
+    )
+    # /media/Datasets/TUM/freiburg3_convert/depth
 
-    parser.add_argument("--gt_pose_dir",
-                        type=str,
-                        help="each frame's gt pose file, saved as previous to current, and filename as current.npy",
-                        default="/media/Datasets/KITTI_VO_SGM/10/npy_pose")
+    parser.add_argument(
+        "--gt_pose_dir",
+        type=str,
+        help="each frame's gt pose file, saved as previous to current, and filename as current.npy",
+        default="/media/Datasets/KITTI_VO_SGM/10/npy_pose",
+    )
 
-    parser.add_argument("--gt_pose_txt",
-                        type=str,
-                        help="this is the gt pose file provided by kitty or tum.",
-                        default="/media/Datasets/KITTI_VO/dataset/poses/10.txt")
+    parser.add_argument(
+        "--gt_pose_txt",
+        type=str,
+        help="this is the gt pose file provided by kitty or tum.",
+        default="/media/Datasets/KITTI_VO/dataset/poses/10.txt",
+    )
 
-    parser.add_argument('--align', type=str,
-                        choices=['scale', 'scale_7dof', '7dof', '6dof'],
-                        default='7dof',
-                        help="alignment type")
+    parser.add_argument(
+        "--align",
+        type=str,
+        choices=["scale", "scale_7dof", "7dof", "6dof"],
+        default="7dof",
+        help="alignment type",
+    )
 
-    parser.add_argument("--named",
-                        type=str,
-                        help="the names for saving pose",
-                        default="kitty_vo_10")
+    parser.add_argument(
+        "--named", type=str, help="the names for saving pose", default="kitty_vo_10"
+    )
 
     args = parser.parse_args()
     run(args)
