@@ -22,6 +22,7 @@ class TrajectoryDrawer:
         height=None,
         point_size=2,
         drawpointcloud=True,
+        useFigureWidget=True,
     ):
         """Build the Trajectory drawer
         Args:
@@ -38,6 +39,7 @@ class TrajectoryDrawer:
             height(int): the height of figure in pixel. Defaults to None
             point_size (int): the size of the marker point in pixel. Defauts to 2
             drawpointcloud (bool): if is false the plot show only trajectory and not the point cloud. Defaults to True
+            useFigureWidget (bool): use the plotily.graph_object.FigureWidget istance if false it used a plotily.graph_object.Figure
         """
         self.eye_x = eye_x
         self.eye_y = eye_y
@@ -50,7 +52,10 @@ class TrajectoryDrawer:
         self.point_size = point_size
         self.drawpointcloud = drawpointcloud
         # initialize the figure
-        self.figure = go.FigureWidget()
+        if useFigureWidget:
+            self.figure = go.FigureWidget()
+        else:
+            self.figure = go.Figure()
         # hide the axis and change the aspect ratio
         self.figure.update_layout(
             showlegend=False,
@@ -95,7 +100,7 @@ class TrajectoryDrawer:
         """
         if slampy_app.get_state() == slampy.State.OK:
             # get the depth and pose
-            pose = slampy_app.get_pose_inverse()
+            pose = slampy_app.get_pose()
             depth = slampy_app.get_depth()
 
             if self.drawpointcloud:
@@ -104,9 +109,7 @@ class TrajectoryDrawer:
 
                 # convert the camera coordinates to world coordinates
                 cp, colors = zip(*points_colored)
-                wp = np.array(
-                    [np.dot(np.linalg.inv(pose), point)[0:3] for point in cp]
-                ).reshape(-1, 3)
+                wp = np.array([np.dot(pose, point)[0:3] for point in cp]).reshape(-1, 3)
 
                 # draw the point cloud
                 self.figure.add_scatter3d(
@@ -121,7 +124,7 @@ class TrajectoryDrawer:
                 )
 
             # get the camera center in absolute coordinates
-            camera_center = np.linalg.inv(pose)[0:3, 3].flatten()
+            camera_center = pose[0:3, 3].flatten()
             if self.prec_camera_center is not None:
                 self.figure.add_scatter3d(
                     x=np.array(
@@ -152,4 +155,5 @@ class TrajectoryDrawer:
                         ),
                     ),
                 ),
+            self.prec_camera_center = camera_center
             return self.figure.layout.scene
