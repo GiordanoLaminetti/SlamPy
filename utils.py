@@ -71,6 +71,13 @@ def compute_errors(gt, pred):
         abs_rel,sq_rel,rmse,rmse_log : the error
 
     """
+    """Computation of error metrics between predicted and ground truth depths
+    """
+    thresh = np.maximum((gt / pred), (pred / gt))
+    a1 = (thresh < 1.25     ).mean()
+    a2 = (thresh < 1.25 ** 2).mean()
+    a3 = (thresh < 1.25 ** 3).mean()
+
     rmse = (gt - pred) ** 2
     rmse = np.sqrt(rmse.mean())
 
@@ -81,7 +88,8 @@ def compute_errors(gt, pred):
 
     sq_rel = np.mean(((gt - pred) ** 2) / gt)
 
-    return abs_rel, sq_rel, rmse, rmse_log
+    return abs_rel, sq_rel, rmse, rmse_log, a1, a2, a3
+
 
 
 def convert_scale(points, gt_depth):
@@ -210,3 +218,187 @@ def save_pose(dest, pose):
     """
 
     np.save(f"{dest}.npy", pose)
+
+
+def save_pose_txt(args, name, pose):
+    """Save pose as txt file
+
+    Args:
+        dir: directory of pose.txt
+        name: frame name or id
+        pose: ndarray with 4x4 pose matrix (as R|t in homogeneous notation)
+
+    Returns:
+        None, but it creates a new npy file with the pose
+    """
+    pose_file_path = os.path.join(args.dest, "pose.txt")
+    fp = open(pose_file_path, 'a')
+    pose34 = pose[:3]
+
+    fp.write(name)
+    for row in pose34:
+        fp.write(" ")
+        fp.write(" ".join(str(round(i, 10)) for i in row))
+    #fp.write('\n')
+    fp.write('\n')
+    fp.close()
+
+def evaluate_pose(args):
+    """Evaluate odometry on the KITTI dataset
+    """
+    orb_pose_dir = os.path.join(args.dest, "pose")
+    pred_poses = []
+    gt_local_poses = []
+    ates = []
+    for count, dir_name in enumerate(sorted(os.listdir(orb_pose_dir))):
+        fileId = os.path.splitext(dir_name)[0]
+        id = fileId.zfill(6)
+        pose_file = os.path.join(orb_pose_dir, '{}.npy'.format(id))
+        pred_poses.append(np.load(pose_file))
+
+        gt_pose_file = os.path.join(args.gt_pose_dir, '{}.npy'.format(id))
+        gt_local_poses.append(np.load(gt_pose_file))
+
+    num_frames = len(gt_local_poses)
+    track_length = 5
+    for i in range(0, num_frames-track_length-1):
+        if i == num_frames -track_length-2:
+            print("break")
+        local_xyzs = np.array(dump_xyz(pred_poses[i:i + track_length - 1]))
+        gt_local_xyzs = np.array(dump_xyz(gt_local_poses[i:i + track_length - 1]))
+        ates.append(compute_ate(gt_local_xyzs, local_xyzs))
+
+    print("\n   Trajectory error: {:0.3f}, std: {:0.3f}\n".format(np.mean(ates), np.std(ates)))
+
+
+# from https://github.com/tinghuiz/SfMLearner
+def dump_xyz(source_to_target_transformations):
+    xyzs = []
+    cam_to_world = np.eye(4)
+    xyzs.append(cam_to_world[:3, 3])
+    for source_to_target_transformation in source_to_target_transformations:
+        cam_to_world = np.dot(cam_to_world, source_to_target_transformation)
+        xyzs.append(cam_to_world[:3, 3])
+    return xyzs
+
+
+# from https://github.com/tinghuiz/SfMLearner
+def compute_ate(gtruth_xyz, pred_xyz_o):
+
+    # Make sure that the first matched frames align (no need for rotational alignment as
+    # all the predicted/ground-truth snippets have been converted to use the same coordinate
+    # system with the first frame of the snippet being the origin).
+    offset = gtruth_xyz[0] - pred_xyz_o[0]
+    pred_xyz = pred_xyz_o + offset[None, :]
+
+    # Optimize the scaling factor
+    scale = np.sum(gtruth_xyz * pred_xyz) / (np.sum(pred_xyz ** 2)+0.00001)
+    alignment_error = pred_xyz * scale - gtruth_xyz
+    rmse = np.sqrt(np.sum(alignment_error ** 2)) / gtruth_xyz.shape[0]
+    return rmse
+
+
+def save_depth_err_results(file_path,filename, err):
+    f = open(file_path, 'a+')
+    print('----------------------------------------------')
+    print('image id:{}'.format(filename))
+    print("\n  " + ("{:>8} | " * 7).format("abs_rel", "sq_rel", "rmse", "rmse_log", "a1", "a2", "a3"))
+    print(("&{: 8.3f}  " * 7).format(*err) + "\\\\")
+
+    f.writelines('----------------------------------------------\n')
+    f.writelines('image id:{}'.format(filename))
+    f.writelines(
+        "\n  " + ("{:>8} | " * 7).format("abs_rel", "sq_rel", "rmse", "rmse_log", "a1", "a2", "a3"))
+    f.writelines("\n")
+    f.writelines(("&{: 8.3f}  " * 7).format(*err) + "\\\\")
+    f.writelines("\n")
+    return
+
+def get_error(args, filename, points, gt_filename):
+    """Get the realtive gt from it's filename and convert the scale of the predictions in order to compute the error
+
+    Args:
+        points: the predictions depth
+        gt_filename: the gt references filename
+
+    Returns:
+        the error computed on this examples
+    """
+    MIN_DEPTH = 1e-3
+    if args.data_type=='KITTI_VO':
+        MAX_DEPTH = 100
+        gt_depth = cv2.imread(gt_filename, -1) / 256
+        if gt_depth is None:
+            print("gt path err {}".gt_filename)
+            return None
+    elif args.data_type=='TUM':
+        MAX_DEPTH = 10
+        gt_depth = (cv2.imread(gt_filename, -1) / 256) / 5000.0
+        if gt_depth is None:
+            print("gt path err {}".gt_filename)
+            return None
+    else:
+        print("Error data type {}".format(args.data_type))
+        return
+    pred_depth = points
+
+    mask_pred = pred_depth > 0
+    mask_gt = gt_depth > 0
+    mask = (mask_pred) & (mask_gt)
+    gt_depth = gt_depth[mask]
+    pred_depth = pred_depth[mask]
+
+    ratio = np.median(gt_depth) / np.median(pred_depth)
+    pred_depth *= ratio
+
+    pred_depth[pred_depth < MIN_DEPTH] = MIN_DEPTH
+    pred_depth[pred_depth > MAX_DEPTH] = MAX_DEPTH
+    err = compute_errors(gt_depth, pred_depth)
+
+    save_results = os.path.join(args.dest, "results.txt")
+    save_depth_err_results(save_results, filename, err)
+
+    return err
+
+def load_images_KITTI_VO(path_to_sequence):
+    """Return the sequence of the images found in the path and the corrispondent timestamp
+
+    Args:
+        path_to_sequence : the sequence in witch we can found the image sequences
+
+    Returns :
+        two array : one contains the sequence of the image filename and the second the timestamp in whitch they are acquired
+
+    """
+    timestamps = []
+    t0 = None
+    with open(os.path.join(path_to_sequence, "times.txt")) as times_file:
+        for line in times_file:
+            if len(line) > 0:
+                timestamps.append(float(line))
+    return [
+        os.path.join(path_to_sequence, "data", str(idx).zfill(6) + ".png")
+        for idx in range(len(timestamps))
+    ], timestamps
+
+def load_images_TUM(path_to_sequence, file_name):
+    """Return the sequence of the images found in the path and the corrispondent timestamp
+
+    Args:
+        path_to_sequence : the sequence in witch we can found the image sequences
+
+    Returns:
+        two array : one contains the sequence of the image filename and the second the timestamp in whitch they are acquired
+
+    """
+    timestamps = []
+    rgb_filenames = []
+    with open(os.path.join(path_to_sequence, file_name)) as times_file:
+        for line in times_file:
+            if len(line) > 0 and not line.startswith("#"):
+                t, rgb = line.rstrip().split(" ")[0:2]
+                rgb_filenames.append(rgb)
+                timestamps.append(float(t))
+
+    return [os.path.join(path_to_sequence, name) for name in rgb_filenames], timestamps
+
