@@ -264,7 +264,7 @@ class System:
         """This private method is used to compute the transormation between the absolute point to the image point
 
         Return:
-            an array of pair (camera view, image point) , an empty list if the traking is failed
+            a np.ndarray of pairs (camera view, image point) , an empty list if the tracking is failed
 
         """
         points2D = []
@@ -289,10 +289,10 @@ class System:
         return points2D
 
     def get_camera_matrix(self):
-        """Get the instrinsec parameter of camera
+        """Get the camera instrinsics
 
         Returns:
-            the camera matrix
+            np.ndarray with shape 3x4 containing the camera parameters.
         """
         return self.slam.get_camera_matrix()
 
@@ -300,7 +300,7 @@ class System:
         """Get the current state of the SLAM system
 
         Returns:
-            an State enums corresponding to the state
+            a State corresponding to the state
         """
         return self.slam.get_state()
 
