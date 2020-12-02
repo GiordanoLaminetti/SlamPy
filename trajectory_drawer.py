@@ -25,6 +25,7 @@ class TrajectoryDrawer:
         useFigureWidget=True,
     ):
         """Build the Trajectory drawer
+
         Args:
             eye_x (float): determines the x view point about the origin of this scene. Defaults to -18.0
             eye_y (float): determines the y view point about the origin of this scene. Defaults to -13.0

@@ -41,6 +41,7 @@ class System:
 
     def __init__(self, params_file, sensor_type):
         """Build the wrapper
+
         Args:
             params_file (str): the Path to the .yaml file.
             sensor_type (Enum): the sensort type of the SLAM
