@@ -1,0 +1,9 @@
+Sphinx==3.2.1
+nbsphinx==0.8.0
+sphinx-rtd-theme==0.5.0
+sphinxcontrib-bibtex==1.0.0
+black==20.8b1
+pytest==6.1.1
+pytest-black==0.3.12
+tqdm==4.50.2
+opencv-contrib-python==3.4.11.45
