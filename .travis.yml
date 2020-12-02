@@ -2,20 +2,20 @@ dist: focal
 
 git:
   depth: false
-  
+
 language: python
-cache: 
+cache:
   - pip
   - dependencies
 
 python:
-    - "3.8"
+  - "3.8"
 
-install: 
-    - pip install -r requirements.txt
+install:
+  - pip install -r docs/requirements.txt
 
 script:
-    - python -m pytest --black ./
+  - python -m pytest --black ./
 
 notifications:
   email: false
