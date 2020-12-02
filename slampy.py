@@ -170,12 +170,12 @@ class System:
         return self.get_state()
 
     def get_pose(self, precedent_frame=-1):
-        """Get the frame pose between a previous frame in the sequence and the current one.
-        Our aim is to compute the pose between a frame X and the current one T, i.e. X->T.
-        The param precedent_frame allows to distinguish between different situations:
-        * if precedent_frame=-1, then X is the first frame of the sequence. We get the pose between 0->T
-        * if precedent_frame > 0, then X is T-precedent_frame. For instance, if precedent_frame=1, it means we are computing the
-        pose between T-1 -> T.
+        """Get the pose between a previous frame X in the sequence and the current one T.
+
+        The param `precedent_frame` allows to distinguish between different situations:
+        * precedent_frame = -1:  X is the first frame of the sequence. We get the pose between 0->T
+        * precedent_frame > 0 :  X is frame at (T-precedent_frame). For instance, if precedent_frame=1, it means we are computing the
+        pose  (T-1) -> T.
 
         Args:
             precedent_frame : id of the frame to use when computing the pose between frame. Default is -1 (i.e., pose 0->T)
@@ -186,9 +186,9 @@ class System:
 
 
         Examples:
-            >>> slam.get_pose() # return the pose between the reference frame (frame 0 in the sequence) and the current one
-            >>> slam.get_pose(precedent_frame=1) # return the pose between the previous frame and the current one
-            >>> slam.get_pose(precedent_frame=2) # return the pose between the frame at 2 timestamps ago and the current one
+            >>> slam.get_pose() # return the pose 0 -> T
+            >>> slam.get_pose(precedent_frame=1) # return the pose (T-1) -> T
+            >>> slam.get_pose(precedent_frame=2) # return the pose (T-2) -> T 
 
         """
         if self.get_state() == State.OK:
@@ -205,13 +205,13 @@ class System:
         return None
 
     def get_pose_inverse(self):
-        """Get the inverse frame pose between the frame 0 and the current one."""
+        """Get the pose from the current frame T to the reference one 0."""
         if self.get_state() == State.OK:
             return np.linalg.inv(self.slam.get_pose())
         return None
 
     def get_abs_cloud(self):
-        """Get the point cloud at the current frame stored in it's aboslute coordinate .
+        """Get the point cloud at the current frame stored in absolute coordinates.
 
         Return:
             an array with the 3D coordinate of the point, None if the traking is failed
