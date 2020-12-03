@@ -8,9 +8,14 @@ RUN if $build_dependences ; then \
 				useradd -d /slampy slampy ;\
 				mkdir /slampy; \
 				chown -R slampy:slampy /slampy ; \
-				apt-get update  && apt-get install -y git wget unzip tmux pkg-config \
-																									libglew-dev python3-dev \
-																									python3-pip cmake ffmpeg \
+				apt-get update ;\
+				apt-get install -y software-properties-common ;\
+				add-apt-repository -y ppa:deadsnakes/ppa;\
+				echo 'add properties';\
+				apt-get update  && apt-get install -y git wget unzip tmux pkg-config curl \
+																									libglew-dev python3.8-dev \
+																									python3-pip python3.8-venv \
+																									cmake ffmpeg \
 																									libgl1-mesa-dev libavcodec-dev \
 																									libavutil-dev libavformat-dev \
 																									libswscale-dev libavdevice-dev \
@@ -19,13 +24,15 @@ RUN if $build_dependences ; then \
 																									libopenexr-dev \
 																									qemu gcc-aarch64-linux-gnu \
 																									libboost-all-dev libpcap-dev libssl-dev; \
-				python3 -mpip install numpy pyopengl Pillow pybind11 jupyter matplotlib \
-															pandas pyyaml plotly; fi
+				python3 -mpip install numpy pyopengl Pillow pybind11 pandas ; \
+				update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 1;\
+				update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 2;fi
 
 
+RUN mkdir /slampy/program
 # Pangolin installation
 
-ARG Pangolin_Path='/slampy/Pangolin'
+ARG Pangolin_Path='/slampy/program/Pangolin'
 ARG build_dependences=true
 
 RUN mkdir $Pangolin_Path
@@ -43,7 +50,7 @@ RUN if $build_dependences ; then \
 			make install; fi
 
 #Eigen installation
-ARG Eigen_Path='/slampy/Eigen'
+ARG Eigen_Path='/slampy/program/Eigen'
 ARG build_dependences=true
 
 RUN mkdir $Eigen_Path
@@ -58,19 +65,18 @@ RUN if $build_dependences ; then \
 			make install; fi
 
 # OpenCV installation
-ARG opencv_Path='/slampy/opencv-3.4.11'
-ARG opencv_contrib_Path='/slampy/opencv_contrib-3.4.11'
+ARG opencv_Path='/slampy/program/opencv-3.4.11'
+ARG opencv_contrib_Path='/slampy/program/opencv_contrib-3.4.11'
 ARG build_dependences=true
 
 RUN mkdir $opencv_Path
 RUN if $build_dependences ; then \
 				wget https://github.com/opencv/opencv/archive/3.4.11.zip ; \
-				unzip 3.4.11.zip -d /slampy ;\
+				unzip 3.4.11.zip -d /slampy/program ;\
 				rm 3.4.11.zip; \
 				wget https://github.com/opencv/opencv_contrib/archive/3.4.11.zip ;\
-				unzip 3.4.11.zip -d /slampy ;\
+				unzip 3.4.11.zip -d /slampy/program ;\
 				rm 3.4.11.zip; fi
-
 RUN cd $opencv_Path
 RUN mkdir $opencv_Path/build
 
@@ -85,7 +91,7 @@ RUN if $build_dependences ; then \
 
 
 # Orb_Slam2 installation
-ARG Orb_Slam2_Path='/slampy/OrbSlam2'
+ARG Orb_Slam2_Path='/slampy/program/OrbSlam2'
 ARG build_orbslam2=true
 
 RUN mkdir $Orb_Slam2_Path
@@ -105,7 +111,7 @@ RUN if $build_orbslam2 ; then \
 
 
 # Orb_Slam3
-ARG Orb_Slam3_Path='/slampy/OrbSlam3'
+ARG Orb_Slam3_Path='/slampy/program/OrbSlam3'
 ARG build_orbslam3=true
 
 RUN mkdir $Orb_Slam3_Path
@@ -123,7 +129,7 @@ RUN if $build_orbslam3 ; then \
 
 
 # OrbSlam2-python Bindings
-ARG Orb_Slam2_PB_Path='/slampy/OrbSlam2-PythonBinding'
+ARG Orb_Slam2_PB_Path='/slampy/program/OrbSlam2-PythonBinding'
 ARG build_orbslam2=true
 
 RUN if [ ! -L "/usr/lib/x86_64-linux-gnu/libboost_python-py35.so" ]; then \
@@ -145,10 +151,10 @@ RUN if $build_orbslam2 ; then \
 				make -j7 ;\
 				make install ;\
 				ln -s /usr/local/lib/python3.5/dist-packages/orbslam2.so \
-         			/usr/local/lib/python3.6/dist-packages/orbslam2.so ; fi
+         			/usr/local/lib/python3.8/dist-packages/orbslam2.so ; fi
 
 # OrbSlam3-python Bindings
-ARG Orb_Slam3_PB_Path='/slampy/OrbSlam3-PythonBinding'
+ARG Orb_Slam3_PB_Path='/slampy/program/OrbSlam3-PythonBinding'
 ARG build_orbslam3=true
 
 RUN mkdir $Orb_Slam3_PB_Path
@@ -164,15 +170,25 @@ RUN if $build_orbslam3 ; then \
 				make -j7 ;\
 				make install ;\
 				ln -s /usr/local/lib/python3.5/dist-packages/orbslam3.so \
-         			/usr/local/lib/python3.6/dist-packages/ ;fi
+         			/usr/local/lib/python3.8/dist-packages/ ;fi
 
 #remove all the folder
 WORKDIR /slampy
-RUN rm -rf /slampy/*
+RUN rm -rf /slampy/program
 RUN ldconfig
+
+RUN pip3 install poetry
 #change user
 USER slampy
+
 COPY . /slampy/slampy
 WORKDIR /slampy/slampy
+
+RUN poetry config virtualenvs.create false
+RUN poetry install --no-root
+ENV PATH /slampy/.local/bin:$PATH
+RUN jupyter nbextension enable --py widgetsnbextension
+RUN jupyter nbextension enable --py plotlywidget
+
 EXPOSE 8888
 
