@@ -73,7 +73,7 @@ class System:
         self.slam.process_image_mono(image, tframe)
         self.image = image
         if self.get_state() == State.OK:
-            self.pose_array.append(self.get_pose())
+            self.pose_array.append(self.get_pose_to_target())
         return self.get_state()
 
     def process_image_stereo(self, image_left, image_right, tframe):
@@ -96,7 +96,7 @@ class System:
         self.slam.process_image_stereo(image_left, image_right, tframe)
         self.image = image
         if self.get_state() == State.OK:
-            self.pose_array.append(self.get_pose())
+            self.pose_array.append(self.get_pose_to_target())
         return self.get_state()
 
     def process_image_imu_mono(self, image, tframe, imu):
@@ -119,7 +119,7 @@ class System:
         self.slam.process_image_imu_mono(image, tframe, imu)
         self.image = image
         if self.get_state() == State.OK:
-            self.pose_array.append(self.get_pose())
+            self.pose_array.append(self.get_pose_to_target())
         return self.get_state()
 
     def process_image_imu_stereo(self, image_left, image_right, tframe, imu):
@@ -143,7 +143,7 @@ class System:
         self.slam.process_image_imu_stereo(image_left, image_right, tframe, imu)
         self.image = image
         if self.get_state() == State.OK:
-            self.pose_array.append(self.get_pose())
+            self.pose_array.append(self.get_pose_to_target())
         return self.get_state()
 
     def process_image_rgbd(self, image, tframe):
@@ -166,10 +166,10 @@ class System:
         self.slam.process_image_rgbd(image, tframe)
         self.image = image
         if self.get_state() == State.OK:
-            self.pose_array.append(self.get_pose())
+            self.pose_array.append(self.get_pose_to_target())
         return self.get_state()
 
-    def get_pose(self, precedent_frame=-1):
+    def get_pose_to_target(self, precedent_frame=-1):
         """Get the pose between a previous frame X in the sequence and the current one T.
 
         The param `precedent_frame` allows to distinguish between different situations:
@@ -186,28 +186,28 @@ class System:
 
 
         Examples:
-            >>> slam.get_pose() # return the pose 0 -> T
-            >>> slam.get_pose(precedent_frame=1) # return the pose (T-1) -> T
-            >>> slam.get_pose(precedent_frame=2) # return the pose (T-2) -> T 
+            >>> slam.get_pose_to_target() # return the pose 0 -> T
+            >>> slam.get_pose_to_target(precedent_frame=1) # return the pose (T-1) -> T
+            >>> slam.get_pose_to_target(precedent_frame=2) # return the pose (T-2) -> T
 
         """
         if self.get_state() == State.OK:
             if precedent_frame <= 0:
-                return self.slam.get_pose()
+                return self.slam.get_pose_to_target()
             else:
-                # get_pose = pose 0->T
+                # get_pose_to_target = pose 0->T
                 # inv(0->T-precedent_frame) = pose T-precedent_frame to 0
                 # pose T-precedent_frame->T = 0->T * (T-1 -> 0)
                 return np.dot(
-                    self.slam.get_pose(),
+                    self.slam.get_pose_to_target(),
                     np.linalg.inv(self.pose_array[-precedent_frame]),
                 )
         return None
 
-    def get_pose_inverse(self):
+    def get_pose_from_target(self):
         """Get the pose from the current frame T to the reference one 0."""
         if self.get_state() == State.OK:
-            return np.linalg.inv(self.slam.get_pose())
+            return np.linalg.inv(self.slam.get_pose_to_target())
         return None
 
     def get_abs_cloud(self):
@@ -270,7 +270,7 @@ class System:
         points2D = []
         points = self.get_abs_cloud()
         camera_matrix = self.slam.get_camera_matrix()
-        pose = self.get_pose_inverse()
+        pose = self.get_pose_from_target()
         for point in points:
             point = np.append(point, [1]).reshape(4, 1)
             camera_points = np.dot(pose, point)

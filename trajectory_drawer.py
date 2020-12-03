@@ -101,7 +101,7 @@ class TrajectoryDrawer:
         """
         if slampy_app.get_state() == slampy.State.OK:
             # get the depth and pose
-            pose = slampy_app.get_pose()
+            pose = slampy_app.get_pose_to_target()
             depth = slampy_app.get_depth()
 
             if self.drawpointcloud:

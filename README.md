@@ -8,7 +8,6 @@ This project is a python wrapper to SLAM algorithms.
     <img src="assets/SLAM.gif" width='100%'/>
 </p>
 
-	
 At the moment, we provide support for:
 
 - ORB_SLAM2

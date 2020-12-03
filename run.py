@@ -54,7 +54,9 @@ def run(args):
             # NOTE: we buid a default invalid depth, in the case of system failure
             if state == slampy.State.OK:
                 depth = app.get_depth()
-                pose_past_frame_to_current = app.get_pose(precedent_frame=args.pose_id)
+                pose_past_frame_to_current = app.get_pose_to_target(
+                    precedent_frame=args.pose_id
+                )
                 name = os.path.splitext(os.path.basename(image_name))[0]
                 depth_path = os.path.join(dest_depth, name)
                 save_depth(depth_path, depth)
@@ -62,7 +64,7 @@ def run(args):
                 pose_path = os.path.join(dest_pose, name)
                 save_pose(pose_path, pose_past_frame_to_current)
 
-                curr_pose = app.get_pose(-1)
+                curr_pose = app.get_pose_to_target(-1)
                 if curr_pose is not None:
                     save_pose_txt(args, name, curr_pose)
 

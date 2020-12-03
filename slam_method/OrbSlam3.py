@@ -86,7 +86,7 @@ class Slam:
         else:
             raise Exception("The sensor type is not RGBD")
 
-    def get_pose(self):
+    def get_pose_to_target(self):
         if self.slam.get_tracking_state() == orbslam3.TrackingState.OK:
             return np.linalg.inv(self.slam.get_frame_pose())
 
