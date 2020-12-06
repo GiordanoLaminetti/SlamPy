@@ -11,8 +11,7 @@ RUN if $build_dependences ; then \
 				apt-get update ;\
 				apt-get install -y software-properties-common ;\
 				add-apt-repository -y ppa:deadsnakes/ppa;\
-				echo 'add properties';\
-				apt-get update  && apt-get install -y git wget unzip tmux pkg-config curl \
+				apt-get update  && apt-get install -y --no-install-recommends git wget unzip tmux pkg-config curl \
 																									libglew-dev python3.8-dev \
 																									python3-pip python3.8-venv \
 																									cmake ffmpeg \
@@ -23,15 +22,17 @@ RUN if $build_dependences ; then \
 																									libjpeg-dev libtiff5-dev \
 																									libopenexr-dev \
 																									qemu gcc-aarch64-linux-gnu \
-																									libboost-all-dev libpcap-dev libssl-dev; \
+																									libboost-all-dev libpcap-dev libssl-dev g++ ;\
 				python3 -mpip install numpy pyopengl Pillow pybind11 pandas ; \
+				ldconfig ;\
+				rm -rf /var/lib/apt/lists/* ;\
 				update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 1;\
 				update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 2;fi
 
 
 RUN mkdir /slampy/program
-# Pangolin installation
 
+# Pangolin installation
 ARG Pangolin_Path='/slampy/program/Pangolin'
 ARG build_dependences=true
 
@@ -177,7 +178,7 @@ WORKDIR /slampy
 RUN rm -rf /slampy/program
 RUN ldconfig
 
-RUN pip3 install poetry
+RUN pip3 install poetry setuptools
 #change user
 USER slampy
 
