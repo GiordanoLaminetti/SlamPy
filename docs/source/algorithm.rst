@@ -137,7 +137,7 @@ You can add your own accessor method, but the method described below must be pre
 
        reset/initialize the slam tracking
   
-     .. py:method:: shutdown(self)
+    .. py:method:: shutdown(self)
 
        shutdown the slam algorithm
  
