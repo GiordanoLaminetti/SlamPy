@@ -7,6 +7,7 @@ pytest==6.1.1
 pytest-black==0.3.12
 tqdm==4.50.2
 opencv-contrib-python==3.4.11.45
+sphinx-argparse==0.2.5
 matplotlib
 Pillow
 numpy

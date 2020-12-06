@@ -92,99 +92,101 @@ def run(args):
         eval_tool.eval(args)
 
 
+parser = argparse.ArgumentParser(
+    description="Run the SLAM system and save, at each frame, the current depth and pose"
+)
+
+parser.add_argument(
+    "--dataset",
+    type=str,
+    default="/media/Datasets/KITTI_VO/dataset/sequences/10",
+    help="path to dataset",
+)
+parser.add_argument(
+    "--settings",
+    type=str,
+    default="./settings_kitty.yaml",
+    help="which configuration?",
+)
+parser.add_argument(
+    "--dest",
+    type=str,
+    default="./results_kitty_vo_10",
+    help="where do we save artefacts?",
+)
+parser.add_argument(
+    "--pose_id",
+    type=int,
+    default=-1,
+    help="between which frames do you want compute the pose? If pose_id==-1, get the pose between 0->T; \
+        if pose_id >0, compute the pose between T-pose_id->T \
+        For instance, if pose_id=2 then compute the pose between T-2->T",
+)
+parser.add_argument(
+    "--is_evalute_depth",
+    default=True,
+    action="store_true",
+    help="If set, will evalute the orb depth with the gt files ",
+)
+
+parser.add_argument(
+    "--is_evalute_pose",
+    default=True,
+    action="store_true",
+    help="If set, will evalute the orb pose with the gt files",
+)
+
+parser.add_argument(
+    "--is_bash",
+    # default=True,
+    action="store_true",
+    help="If set, means use bash shell to evaluate",
+)
+
+parser.add_argument(
+    "--data_type",
+    type=str,
+    help="which dataset type",
+    default="KITTI_VO",
+    choices=["TUM", "KITTI_VO", "KITTI"],
+)
+
+parser.add_argument(
+    "--gt_depth",
+    type=str,
+    help="the gt depth files of the dataset",
+    default="/media/Datasets/KITTI_VO_SGM/10/depth",
+)
+# /media/Datasets/TUM/freiburg3_convert/depth
+
+parser.add_argument(
+    "--gt_pose_dir",
+    type=str,
+    help="each frame's gt pose file, saved as previous to current, and filename as current.npy",
+    default="/media/Datasets/KITTI_VO_SGM/10/npy_pose",
+)
+
+parser.add_argument(
+    "--gt_pose_txt",
+    type=str,
+    help="this is the gt pose file provided by kitty or tum.",
+    default="/media/Datasets/KITTI_VO/dataset/poses/10.txt",
+)
+
+parser.add_argument(
+    "--align",
+    type=str,
+    choices=["scale", "scale_7dof", "7dof", "6dof"],
+    default="7dof",
+    help="alignment type",
+)
+
+parser.add_argument(
+    "--named", type=str, help="the names for saving pose", default="kitty_vo_10"
+)
+
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Run the SLAM system and save, at each frame, the current depth and pose"
-    )
-
-    parser.add_argument(
-        "--dataset",
-        type=str,
-        default="/media/Datasets/KITTI_VO/dataset/sequences/10",
-        help="path to dataset",
-    )
-    parser.add_argument(
-        "--settings",
-        type=str,
-        default="./settings_kitty.yaml",
-        help="which configuration?",
-    )
-    parser.add_argument(
-        "--dest",
-        type=str,
-        default="./results_kitty_vo_10",
-        help="where do we save artefacts?",
-    )
-    parser.add_argument(
-        "--pose_id",
-        type=int,
-        default=-1,
-        help="between which frames do you want compute the pose? If pose_id==-1, get the pose between 0->T; \
-            if pose_id >0, compute the pose between T-pose_id->T \
-            For instance, if pose_id=2 then compute the pose between T-2->T",
-    )
-    parser.add_argument(
-        "--is_evalute_depth",
-        default=True,
-        action="store_true",
-        help="If set, will evalute the orb depth with the gt files ",
-    )
-
-    parser.add_argument(
-        "--is_evalute_pose",
-        default=True,
-        action="store_true",
-        help="If set, will evalute the orb pose with the gt files",
-    )
-
-    parser.add_argument(
-        "--is_bash",
-        # default=True,
-        action="store_true",
-        help="If set, means use bash shell to evaluate",
-    )
-
-    parser.add_argument(
-        "--data_type",
-        type=str,
-        help="which dataset type",
-        default="KITTI_VO",
-        choices=["TUM", "KITTI_VO", "KITTI"],
-    )
-
-    parser.add_argument(
-        "--gt_depth",
-        type=str,
-        help="the gt depth files of the dataset",
-        default="/media/Datasets/KITTI_VO_SGM/10/depth",
-    )
-    # /media/Datasets/TUM/freiburg3_convert/depth
-
-    parser.add_argument(
-        "--gt_pose_dir",
-        type=str,
-        help="each frame's gt pose file, saved as previous to current, and filename as current.npy",
-        default="/media/Datasets/KITTI_VO_SGM/10/npy_pose",
-    )
-
-    parser.add_argument(
-        "--gt_pose_txt",
-        type=str,
-        help="this is the gt pose file provided by kitty or tum.",
-        default="/media/Datasets/KITTI_VO/dataset/poses/10.txt",
-    )
-
-    parser.add_argument(
-        "--align",
-        type=str,
-        choices=["scale", "scale_7dof", "7dof", "6dof"],
-        default="7dof",
-        help="alignment type",
-    )
-
-    parser.add_argument(
-        "--named", type=str, help="the names for saving pose", default="kitty_vo_10"
-    )
 
     args = parser.parse_args()
     run(args)

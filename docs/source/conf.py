@@ -37,6 +37,7 @@ extensions = [
     "nbsphinx",
     "sphinxcontrib.bibtex",
     "sphinx_rtd_theme",
+    "sphinxarg.ext",
 ]
 napoleon_google_docstring = True
 

@@ -15,7 +15,8 @@ At the moment, we provide support for:
 
 ## Example of usage with ORB_SLAM2
 
-the jupyter notebook **example_usage** shows how to use ORB_SLAM2 with a sequence of the KITTI dataset
+- the jupyter notebook **example_usage** shows how to use ORB_SLAM2 with a sequence of the KITTI dataset
+- the jupyter notebook **trajectory_example** draw the camera trajectory and the point cloud
 
 ## Change the settings
 
@@ -41,7 +42,7 @@ We provided the vocabulary file and the configuration file for ORB_SLAM2/3 for t
 
 ### Docker
 
-We provide a container on dockerhub, in which all all the dipendences and the repository are already installed.
+We provide a container on dockerhub, in which all the dipendences and the repository are already installed.
 
 ```
 docker pull giordanolaminetti/slampy:tag

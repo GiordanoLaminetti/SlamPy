@@ -1,7 +1,12 @@
 run module
 ==========
+.. _run_module:
 
 .. automodule:: run
-   :members:
    :undoc-members:
    :show-inheritance:
+
+   .. argparse::
+      :module: run
+      :func: parser
+      :prog: run
