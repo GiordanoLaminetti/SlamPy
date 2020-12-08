@@ -58,8 +58,8 @@ When the image is ready, you can create a new container running: ::
                     --name $NAME \
                     --mount type=bind,source="$(pwd)",target=/slampy/slampy \
                     -v $DATAPATH:"/slampy/slampy/Dataset":ro \
-                    -p 8888:8888 \
-                    $IMAGE_NAME:$TAG --rm /bin/bash
+                    -p 8888:8888 --rm\
+                    $IMAGE_NAME:$TAG /bin/bash
 
 
 Doing so, the created container contains both the code and the Dataset (in read-only mode to prevent wrong behaviours)
