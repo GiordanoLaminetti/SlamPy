@@ -143,6 +143,6 @@ Dataset/
 .ipython
 .config
 .bash_history
-docker_build.sh
+docker_*.sh
 results/**
 save*.ipynb

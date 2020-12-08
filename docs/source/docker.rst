@@ -53,7 +53,7 @@ When the image is ready, you can create a new container running: ::
     NAME="orb"
     DATAPATH="/PATH/TO/KITTI/DATE/DRIVE_SYNC_FOLDER/"
     IMAGE_NAME="giordanolaminetti/slampy"
-    TAG="latest
+    TAG="latest"
     sudo docker run -it \
                     --name $NAME \
                     --mount type=bind,source="$(pwd)",target=/slampy/slampy \
