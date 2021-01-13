@@ -307,6 +307,7 @@ class System:
     def shutdown(self):
         """Shutdown the SLAM system"""
         self.slam.shutdown()
+        self.pose_array = []
 
     def reset(self):
         """Reset SLAM system"""

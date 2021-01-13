@@ -1,5 +1,6 @@
 import slampy
 import numpy as np
+import yaml
 import plotly.graph_objects as go
 import time
 
@@ -9,48 +10,33 @@ class TrajectoryDrawer:
 
     def __init__(
         self,
-        eye_x=-18.0,
-        eye_y=-13.0,
-        eye_z=-55.0,
-        center_x=-17.0,
-        center_y=-8.0,
-        scale_grade_x=1.0,
-        scale_grade_y=1.0,
-        scale_grade_z=10.0,
-        aspectratio=dict(x=50, y=50, z=100),
+        params_file,
         width=None,
         height=None,
-        point_size=2,
         drawpointcloud=True,
         useFigureWidget=True,
     ):
         """Build the Trajectory drawer
 
         Args:
-            eye_x (float): determines the x view point about the origin of this scene. Defaults to -18.0
-            eye_y (float): determines the y view point about the origin of this scene. Defaults to -13.0
-            eye_z (float): determines the z view point about the origin of this scene. Defaults to -55.0
-            center_x (float): determines the x plane translation about the origin of this scene. Defaults to -17.0
-            center_y (float): determines the y plane translation about the origin of this scene. Defaults to -8.0
-            scale_grade_x (float): determines the zoom about x plane. Defaults to 1
-            scale_grade_y (float): determines the zoom about y plane. Defaults to 1
-            scale_grade_z (float): determines the zoom about z plane. Defaults to 10
-            aspectratio (dict): a dict in the form (x=(int), y=(int), z=(int)) to set the scene aspecratio Defaults to dict(x=50, y=50, z=100)
+            params_file (str): the Path to the .yaml file.
             width(int): the width of figure in pixel. Defaults to None
             height(int): the height of figure in pixel. Defaults to None
-            point_size (int): the size of the marker point in pixel. Defauts to 2
             drawpointcloud (bool): if is false the plot show only trajectory and not the point cloud. Defaults to True
             useFigureWidget (bool): use the plotily.graph_object.FigureWidget instance if false it used the plotily.graph_object.Figure
         """
-        self.eye_x = eye_x
-        self.eye_y = eye_y
-        self.eye_z = eye_z
-        self.center_x = center_x
-        self.center_y = center_y
-        self.scale_grade_x = scale_grade_x
-        self.scale_grade_y = scale_grade_y
-        self.scale_grade_z = scale_grade_z
-        self.point_size = point_size
+        with open(params_file) as fs:
+            self.params = yaml.safe_load(fs)
+
+        self.eye_x = self.params["Drawer.eye.x"]
+        self.eye_y = self.params["Drawer.eye.y"]
+        self.eye_z = self.params["Drawer.eye.z"]
+        self.center_x = self.params["Drawer.center.x"]
+        self.center_y = self.params["Drawer.center.y"]
+        self.scale_grade_x = self.params["Drawer.scale_grade.x"]
+        self.scale_grade_y = self.params["Drawer.scale_grade.y"]
+        self.scale_grade_z = self.params["Drawer.scale_grade.z"]
+        self.point_size = self.params["Drawer.point_size"]
         self.drawpointcloud = drawpointcloud
         # initialize the figure
         if useFigureWidget == True:
@@ -64,7 +50,11 @@ class TrajectoryDrawer:
             height=height,
             scene=dict(
                 aspectmode="manual",
-                aspectratio=aspectratio,
+                aspectratio=dict(
+                    x=self.params["Drawer.aspectratio.x"],
+                    y=self.params["Drawer.aspectratio.y"],
+                    z=self.params["Drawer.aspectratio.z"],
+                ),
                 xaxis=dict(
                     showticklabels=False,
                     showgrid=False,
@@ -114,7 +104,7 @@ class TrajectoryDrawer:
 
                 # draw the point cloud
                 self.figure.add_scatter3d(
-                    x=wp[..., 0],
+                    x=wp[..., 0] * -1,
                     y=wp[..., 1] * -1,
                     z=wp[..., 2],
                     mode="markers",
@@ -122,15 +112,15 @@ class TrajectoryDrawer:
                         size=self.point_size,
                         color=colors,
                     ),
+                    hoverinfo="skip",
                 )
 
             # get the camera center in absolute coordinates
             camera_center = pose[0:3, 3].flatten()
             if self.prec_camera_center is not None:
                 self.figure.add_scatter3d(
-                    x=np.array(
-                        [camera_center[0], self.prec_camera_center[0]]
-                    ).flatten(),
+                    x=np.array([camera_center[0], self.prec_camera_center[0]]).flatten()
+                    * -1,
                     y=np.array([camera_center[1], self.prec_camera_center[1]]).flatten()
                     * -1,
                     z=np.array(
@@ -140,6 +130,7 @@ class TrajectoryDrawer:
                         size=self.point_size * 2, color="red", symbol="diamond"
                     ),
                     line=dict(width=self.point_size, color="red"),
+                    hoverinfo="skip",
                 )
                 self.figure.update_layout(
                     scene_camera=dict(
