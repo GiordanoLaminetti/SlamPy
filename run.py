@@ -32,7 +32,6 @@ def run(args):
 
     print("\n")
 
-
     # TODO: generic loader an not KITTI one
 
     if args.data_type == "TUM":
@@ -41,8 +40,6 @@ def run(args):
         image_filenames, timestamps = load_images_KITTI_VO(args.dataset)
     elif args.data_type == "OTHERS":
         image_filenames, timestamps = load_images_OTHERS(args.dataset)
-   
-    
 
     num_images = len(image_filenames)
 
