@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import slampy
 import argparse
+import yaml
 from tqdm import tqdm
 from utils import *
 from kitti_odometry import KittiEvalOdom
@@ -19,8 +20,18 @@ def run(args):
         raise ValueError(f"Cannot find setting file at {setting_file}")
     if args.pose_id < -1:
         raise ValueError(f"Pose index must be -1 or >0")
+    
+
+    with open(args.settings) as fs:
+         settings_yalm = yaml.safe_load(fs)
+         print("\nAlgorithm " + settings_yalm["SLAM.alg"] + " has been set\n")
+
+    print("Dataset selected: " + os.path.basename(args.dataset) + "\n")
 
     app = slampy.System(setting_file, slampy.Sensor.MONOCULAR)
+
+    print("\n")
+
 
     # TODO: generic loader an not KITTI one
 
@@ -28,6 +39,11 @@ def run(args):
         image_filenames, timestamps = load_images_TUM(args.dataset, "rgb.txt")
     elif args.data_type == "KITTI_VO":
         image_filenames, timestamps = load_images_KITTI_VO(args.dataset)
+    elif args.data_type == "OTHERS":
+        image_filenames, timestamps = load_images_OTHERS(args.dataset)
+   
+    
+
     num_images = len(image_filenames)
 
     dest_depth = os.path.join(args.dest, "depth")
@@ -48,37 +64,40 @@ def run(args):
                 raise ValueError(f"failed to load image {image_name}")
 
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-
+           
             state = app.process_image_mono(image, timestamps[idx])
 
             # NOTE: we buid a default invalid depth, in the case of system failure
             if state == slampy.State.OK:
-                depth = app.get_depth()
+                depth = app.get_depth() #calcola la depth del frame corrente
                 pose_past_frame_to_current = app.get_pose_to_target(
                     precedent_frame=args.pose_id
-                )
-                name = os.path.splitext(os.path.basename(image_name))[0]
-                depth_path = os.path.join(dest_depth, name)
-                save_depth(depth_path, depth)
+                )#calcola la pose del frame corrente rispetto all'imput dell'utente
+                name = os.path.splitext(os.path.basename(image_name))[0] #prepara il nome del frame
+                
+                depth_path = os.path.join(dest_depth, name)  #prepara il file diciamo, deppth_dest from line 33
+                save_depth(depth_path, depth) #da arrray salva in formato  .png
 
                 pose_path = os.path.join(dest_pose, name)
-                save_pose(pose_path, pose_past_frame_to_current)
+                save_pose(pose_path, pose_past_frame_to_current)#salva in formato numpy
 
-                curr_pose = app.get_pose_to_target(-1)
+                curr_pose = app.get_pose_to_target(-1) #pose rispetto all'inizio
                 if curr_pose is not None:
-                    save_pose_txt(args, name, curr_pose)
+                    save_pose_txt(args, name, curr_pose)#salva courrent pose in file txt
 
-                if args.is_evalute_depth:
+                if args.is_evalute_depth: #depth rispetto al gt
                     gt_file_path = os.path.join(args.gt_depth, "{}.png".format(name))
                     err = get_error(args, name, depth, gt_file_path)
                     errors.append(err)
 
             states.append(state)
             pbar.update(1)
-
-        mean_errors = np.array(errors).mean(0)
-        save_results = os.path.join(args.dest, "results.txt")
-        save_depth_err_results(save_results, "mean values", mean_errors)
+        
+        if args.is_evalute_depth: 
+            mean_errors = np.array(errors).mean(0) #calcola la media di una matrice per colonna, risulta un erray con lo stesso numero di colonne i cui elementi sono la media di ogni clonna
+            save_results = os.path.join(args.dest, "results.txt")
+            save_depth_err_results(save_results, "mean values", mean_errors)#la stampa di un erray vuoto in quanto mean(0) di un array vuoto da 0 credo da un errore: format() argument after * must be an iterable, not numpy.float64
+    
 
     # NOTE: final dump of log.txt file
     with open(os.path.join(args.dest, "log.txt"), "w") as f:
@@ -86,7 +105,7 @@ def run(args):
             f.write(f"{i}: {state}\n")
 
     if args.is_evalute_pose:
-        print("Begin to evaluate predicted pose")
+        print("Begin to evaluate predicted pose")#si prende il file pose di numpy array salvato prima in pose e lo confronta col gt
         evaluate_pose(args)
         eval_tool = KittiEvalOdom()
         eval_tool.eval(args)
@@ -124,14 +143,14 @@ parser.add_argument(
 )
 parser.add_argument(
     "--is_evalute_depth",
-    default=True,
+    default=False,
     action="store_true",
     help="If set, will evalute the orb depth with the gt files ",
 )
 
 parser.add_argument(
     "--is_evalute_pose",
-    default=True,
+    default=False,
     action="store_true",
     help="If set, will evalute the orb pose with the gt files",
 )
@@ -148,7 +167,7 @@ parser.add_argument(
     type=str,
     help="which dataset type",
     default="KITTI_VO",
-    choices=["TUM", "KITTI_VO", "KITTI"],
+    choices=["TUM", "KITTI_VO", "KITTI","OTHERS"],
 )
 
 parser.add_argument(
