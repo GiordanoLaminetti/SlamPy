@@ -69,23 +69,23 @@ def run(args):
 
             # NOTE: we buid a default invalid depth, in the case of system failure
             if state == slampy.State.OK:
-                depth = app.get_depth() #calcola la depth del frame corrente
+                depth = app.get_depth() 
                 pose_past_frame_to_current = app.get_pose_to_target(
                     precedent_frame=args.pose_id
-                )#calcola la pose del frame corrente rispetto all'imput dell'utente
-                name = os.path.splitext(os.path.basename(image_name))[0] #prepara il nome del frame
+                )
+                name = os.path.splitext(os.path.basename(image_name))[0] 
                 
-                depth_path = os.path.join(dest_depth, name)  #prepara il file diciamo, deppth_dest from line 33
-                save_depth(depth_path, depth) #da arrray salva in formato  .png
+                depth_path = os.path.join(dest_depth, name)  
+                save_depth(depth_path, depth) 
 
                 pose_path = os.path.join(dest_pose, name)
-                save_pose(pose_path, pose_past_frame_to_current)#salva in formato numpy
+                save_pose(pose_path, pose_past_frame_to_current)
 
-                curr_pose = app.get_pose_to_target(-1) #pose rispetto all'inizio
+                curr_pose = app.get_pose_to_target(-1) 
                 if curr_pose is not None:
-                    save_pose_txt(args, name, curr_pose)#salva courrent pose in file txt
+                    save_pose_txt(args, name, curr_pose)
 
-                if args.is_evalute_depth: #depth rispetto al gt
+                if args.is_evaluate_depth:
                     gt_file_path = os.path.join(args.gt_depth, "{}.png".format(name))
                     err = get_error(args, name, depth, gt_file_path)
                     errors.append(err)
@@ -93,10 +93,10 @@ def run(args):
             states.append(state)
             pbar.update(1)
         
-        if args.is_evalute_depth: 
-            mean_errors = np.array(errors).mean(0) #calcola la media di una matrice per colonna, risulta un erray con lo stesso numero di colonne i cui elementi sono la media di ogni clonna
+        if args.is_evaluate_depth: 
+            mean_errors = np.array(errors).mean(0) 
             save_results = os.path.join(args.dest, "results.txt")
-            save_depth_err_results(save_results, "mean values", mean_errors)#la stampa di un erray vuoto in quanto mean(0) di un array vuoto da 0 credo da un errore: format() argument after * must be an iterable, not numpy.float64
+            save_depth_err_results(save_results, "mean values", mean_errors)
     
 
     # NOTE: final dump of log.txt file
@@ -104,8 +104,8 @@ def run(args):
         for i, state in enumerate(states):
             f.write(f"{i}: {state}\n")
 
-    if args.is_evalute_pose:
-        print("Begin to evaluate predicted pose")#si prende il file pose di numpy array salvato prima in pose e lo confronta col gt
+    if args.is_evaluate_pose:
+        print("Begin to evaluate predicted pose")
         evaluate_pose(args)
         eval_tool = KittiEvalOdom()
         eval_tool.eval(args)
@@ -142,14 +142,14 @@ parser.add_argument(
         For instance, if pose_id=2 then compute the pose between T-2->T",
 )
 parser.add_argument(
-    "--is_evalute_depth",
+    "--is_evaluate_depth",
     default=False,
     action="store_true",
     help="If set, will evalute the orb depth with the gt files ",
 )
 
 parser.add_argument(
-    "--is_evalute_pose",
+    "--is_evaluate_pose",
     default=False,
     action="store_true",
     help="If set, will evalute the orb pose with the gt files",
