@@ -232,7 +232,7 @@ def save_pose_txt(args, name, pose):
     """
     pose_file_path = os.path.join(args.dest, "pose.txt")
     fp = open(pose_file_path, "a")
-    pose34 = pose[:3] #prende dal primo al terzo elemento (partendo da 0) dell'array 
+    pose34 = pose[:3] 
 
     fp.write(name)
     for row in pose34:
