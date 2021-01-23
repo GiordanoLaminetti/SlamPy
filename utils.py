@@ -232,8 +232,11 @@ def save_pose_txt(args, name, pose):
     """
     pose_file_path = os.path.join(args.dest, "pose.txt")
     fp = open(pose_file_path, "a")
-    pose34 = pose[:3]
+    pose34 = pose[:3] 
+<<<<<<< HEAD
+=======
 
+>>>>>>> 1b77b035e07f95e8d286dcf23192f7103c139f23
     fp.write(name)
     for row in pose34:
         fp.write(" ")
@@ -374,6 +377,7 @@ def get_error(args, filename, points, gt_filename):
     return err
 
 
+
 def load_images_KITTI_VO(path_to_sequence):
     """Return the sequence of the images found in the path and the corrispondent timestamp
 
@@ -416,3 +420,38 @@ def load_images_TUM(path_to_sequence, file_name):
                 timestamps.append(float(t))
 
     return [os.path.join(path_to_sequence, name) for name in rgb_filenames], timestamps
+
+
+def load_images_OTHERS(path_to_sequence):
+
+    """Return the sequence of the images found in the path and the corrispondent timestamp
+
+    Args:
+        path_to_sequence : the sequence in witch we can found the image sequences
+
+    Returns :
+        two array : one contains the sequence of the image filename and the second the timestamp in whitch they are acquired
+
+    Inside of path_to_sequence must be: +data
+                                           xxxxxxxx.png 
+                                           xxxxxxxy.png
+                                           ....
+                                        -times.txt 
+    where times.txt simply contains timestamps of every frame
+
+    """
+
+    timestamps = []
+    framenames = []
+
+    with open(os.path.join(path_to_sequence, "times.txt")) as times_file:
+        for line in times_file:
+            if len(line) > 0 and not line.startswith("#"):
+                timestamps.append(float(line))
+                
+    for framename in sorted(os.listdir(os.path.join(path_to_sequence,"data"))):
+        if framename.endswith(".png"):
+            framenames.append(framename)
+
+    return [os.path.join(path_to_sequence,"data",name) for name in framenames], timestamps
+
