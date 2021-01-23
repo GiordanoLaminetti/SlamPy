@@ -233,6 +233,10 @@ def save_pose_txt(args, name, pose):
     pose_file_path = os.path.join(args.dest, "pose.txt")
     fp = open(pose_file_path, "a")
     pose34 = pose[:3] 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 1b77b035e07f95e8d286dcf23192f7103c139f23
     fp.write(name)
     for row in pose34:
         fp.write(" ")
