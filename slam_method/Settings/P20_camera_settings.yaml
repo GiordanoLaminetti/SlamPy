@@ -1,7 +1,7 @@
 %YAML:1.0
 
 #--------------------------------------------------------------------------------------------
-# Camera Parameters. Adjust them!
+# Camera Parameters. This settings refer to a Huawei P20 lite main camera, manually calibrated with opencv [resolution fixed to 720x1280]
 #--------------------------------------------------------------------------------------------
 Camera.type: "PinHole"
 
@@ -26,7 +26,7 @@ Camera.RGB: 1
 
 # Camera resolution
 Camera.width: 720
-Camera.height: 1282
+Camera.height: 1280
 
 #--------------------------------------------------------------------------------------------
 # ORB Parameters
