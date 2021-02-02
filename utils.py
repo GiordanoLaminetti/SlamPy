@@ -233,10 +233,7 @@ def save_pose_txt(args, name, pose):
     pose_file_path = os.path.join(args.dest, "pose.txt")
     fp = open(pose_file_path, "a")
     pose34 = pose[:3] 
-<<<<<<< HEAD
-=======
 
->>>>>>> 1b77b035e07f95e8d286dcf23192f7103c139f23
     fp.write(name)
     for row in pose34:
         fp.write(" ")
@@ -454,4 +451,45 @@ def load_images_OTHERS(path_to_sequence):
             framenames.append(framename)
 
     return [os.path.join(path_to_sequence,"data",name) for name in framenames], timestamps
+
+
+def load_images_TUM_VI(path_to_sequence):
+
+    """ This loader is created for Visual Inertial TUM datasets. Format of such datasets is:
+        path_to_sequence/mav0/cam0/+data/xxxx.png
+                                  /-times.txt
+    """
+    timestamps = []
+    framenames = []
+    
+    with open(os.path.join(path_to_sequence,"mav0/cam0/times.txt")) as times_file:
+        for line in times_file:
+            if len(line) > 0 and not line.startswith("#"):
+                framenames.append(line.split()[0] + ".png")
+                timestamps.append(float(line.split()[1]))
+                
+    return [os.path.join(path_to_sequence,"mav0/cam0/data",name) for name in framenames], timestamps
+
+
+ 
+
+def load_IMU_datas_TUM_VI(path_to_sequence):
+    timestamp = []
+    gyro_data = []
+    acc_data = []
+    with open(os.path.join(path_to_sequence,"mav0/imu0/data.csv")) as imu_file:
+        for line in imu_file:
+            if len(line) > 0 and not line.startswith("#"):
+                imu_line=line.split(",")
+                timestamp.append(float(imu_line[0])*10e-9) 
+                gyro_data.append([float(imu_line[1]),float(imu_line[2]),float(imu_line[3])]) 
+                acc_data.append([float(imu_line[4]),float(imu_line[5]),float(imu_line[6])])
+    
+    return acc_data,gyro_data,timestamp
+
+
+
+
+
+
 

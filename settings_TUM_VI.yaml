@@ -1,0 +1,28 @@
+SLAM.alg: "OrbSlam3"
+#--------------------------------------------------------------------------------------------
+# SLAM Method: change with the name of the .py file in whitch there are the class SLAM
+#--------------------------------------------------------------------------------------------
+
+#--------------------------------------------------------------------------------------------
+# SLAM Params: add your own to run the algorithm
+#--------------------------------------------------------------------------------------------
+SLAM.vocab_path: "slam_method/Settings/ORBvoc.bin"
+SLAM.settings_path: "slam_method/Settings/TUM_512_cameraIMU.yaml"
+
+#--------------------------------------------------------------------------------------------
+# Drawer Params: the extra params of trajectory_drawer class
+# Params Guide https://slampy.readthedocs.io/en/latest/config.html
+#--------------------------------------------------------------------------------------------
+
+Drawer.eye.x: -18.0
+Drawer.eye.y: -13.0
+Drawer.eye.z: -55.0
+Drawer.center.x: -17.0
+Drawer.center.y: -8.0
+Drawer.scale_grade.x: 1.0
+Drawer.scale_grade.y: 1.0
+Drawer.scale_grade.z: 10.0
+Drawer.aspectratio.x: 50
+Drawer.aspectratio.y: 50
+Drawer.aspectratio.z: 100
+Drawer.point_size: 2

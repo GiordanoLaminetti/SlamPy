@@ -68,15 +68,14 @@ class Slam:
 
     def process_image_imu_mono(self, image, tframe, imu):
         if self.sensor_type == Sensor.MONOCULAR_IMU:
-            self.slam.process_image_imu_mono(image, tframe, imu, "0")
+            self.slam.process_image_imu_mono(image, tframe, "0", imu)
         else:
             raise Exception("The sensor type is not MONOCULAR_IMU")
 
     def process_image_imu_stereo(self, image_left, image_right, tframe, imu):
         if self.sensor_type == Sensor.STEREO_IMU:
             self.slam.process_image_imu_stereo(
-                image_left, image_right, tframe, imu, "0"
-            )
+                image_left, image_right, tframe, "0", imu)
         else:
             raise Exception("The sensor type is not STREO_IMU")
 
