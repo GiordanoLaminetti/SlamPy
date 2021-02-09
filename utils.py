@@ -480,7 +480,7 @@ def load_IMU_datas_TUM_VI(path_to_sequence):
         for line in imu_file:
             if len(line) > 0 and not line.startswith("#"):
                 imu_line=line.split(",")
-                timestamp.append(float(imu_line[0])*10e-9) 
+                timestamp.append(float(imu_line[0])*1e-9) 
                 gyro_data.append([float(imu_line[1]),float(imu_line[2]),float(imu_line[3])]) 
                 acc_data.append([float(imu_line[4]),float(imu_line[5]),float(imu_line[6])])
     
