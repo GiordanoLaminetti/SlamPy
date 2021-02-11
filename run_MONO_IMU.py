@@ -34,12 +34,14 @@ def run(args):
 
     if args.data_type == "TUM_VI":
         image_filenames, timestamps = load_images_TUM_VI(args.dataset)
+    elif args.data_type == "EUROC":
+        image_filenames, timestamps = load_images_EuRoC(args.dataset)
     elif args.data_type == "OTHERS":
         image_filenames, timestamps = load_images_OTHERS(args.dataset)
 
     num_images = len(image_filenames)
 
-    if args.data_type == "TUM_VI":
+    if args.data_type == "TUM_VI" or args.data_type =="EUROC":
         acc_data, gyro_data, IMUtimestamps = load_IMU_datas_TUM_VI(args.dataset)
 
     dest_depth = os.path.join(args.dest, "depth")
@@ -80,7 +82,6 @@ def run(args):
                     imu.append(imu_valid_meas)
                     firstIMU += 1
           
-            
             state = app.process_image_imu_mono(image, timestamps[idx], np.array(imu))
 
             # NOTE: we buid a default invalid depth, in the case of system failure
@@ -125,6 +126,8 @@ def run(args):
         evaluate_pose(args)
         eval_tool = KittiEvalOdom()
         eval_tool.eval(args)
+    
+    app.shutdown()
 
 
 parser = argparse.ArgumentParser(
@@ -183,7 +186,7 @@ parser.add_argument(
     type=str,
     help="which dataset type",
     default="KITTI_VO",
-    choices=["TUM", "KITTI_VO", "KITTI","OTHERS","TUM_VI"],
+    choices=["TUM", "KITTI_VO", "KITTI","OTHERS","TUM_VI","EUROC"],
 )
 
 parser.add_argument(

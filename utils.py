@@ -470,17 +470,33 @@ def load_images_TUM_VI(path_to_sequence):
     return [os.path.join(path_to_sequence,"mav0/cam0/data",name) for name in framenames], timestamps
 
 
- 
+def load_images_EuRoC(path_to_sequence):
+
+    """ This loader is created for Visual Inertial EuRoC datasets. Format of such datasets is:
+        path_to_sequence/mav0/cam0/+data/xxxx.png
+                                  /-times.txt
+    """
+    timestamps = []
+    framenames = []
+    
+    with open(os.path.join(path_to_sequence,"mav0/cam0/data.txt")) as times_file:
+        for line in times_file:
+            if len(line) > 0 and not line.startswith("#"):
+                framenames.append(line.split(",")[1].rstrip())
+                timestamps.append(float(line.split(",")[0])*1e-9)
+                
+    return [os.path.join(path_to_sequence,"mav0/cam0/data",name) for name in framenames], timestamps
+
 
 def load_IMU_datas_TUM_VI(path_to_sequence):
     timestamp = []
     gyro_data = []
     acc_data = []
-    with open(os.path.join(path_to_sequence,"mav0/imu0/data.csv")) as imu_file:
+    with open(os.path.join(path_to_sequence,"mav0/imu0/data.txt")) as imu_file:
         for line in imu_file:
             if len(line) > 0 and not line.startswith("#"):
                 imu_line=line.split(",")
-                timestamp.append(float(imu_line[0])*10e-9) 
+                timestamp.append(float(imu_line[0])*1e-9) 
                 gyro_data.append([float(imu_line[1]),float(imu_line[2]),float(imu_line[3])]) 
                 acc_data.append([float(imu_line[4]),float(imu_line[5]),float(imu_line[6])])
     
