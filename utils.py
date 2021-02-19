@@ -242,6 +242,31 @@ def save_pose_txt(args, name, pose):
     fp.close()
 
 
+
+
+def save_pose_and_times_txt(args, name, pose):
+    """Save pose and time in two different txt files."""
+    
+    time_file_path = os.path.join(args.dest, "times.txt")
+    pose_file_path = os.path.join(args.dest, "pose.txt")
+    fd = open(time_file_path, "a")
+    fp = open(pose_file_path, "a")
+    pose34 = pose[:3] 
+    fd.write(name)
+    fd.write("\n")
+    fd.close()
+    line=""
+    for row in pose34:   
+        line+=(" ".join(str(round(i, 10)) for i in row))
+        line+=(" ")
+    line=line[:-1]
+    line+=("\n")
+    fp.write(line)
+    # fp.write('\n')
+    fp.close()
+
+
+
 def evaluate_pose(args):
     """Evaluate odometry on the KITTI dataset"""
     orb_pose_dir = os.path.join(args.dest, "pose")
