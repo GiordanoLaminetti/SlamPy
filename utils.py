@@ -504,7 +504,7 @@ def load_images_EuRoC(path_to_sequence):
     timestamps = []
     framenames = []
     
-    with open(os.path.join(path_to_sequence,"mav0/cam0/data.txt")) as times_file:
+    with open(os.path.join(path_to_sequence,"mav0/cam0/data.csv")) as times_file:
         for line in times_file:
             if len(line) > 0 and not line.startswith("#"):
                 framenames.append(line.split(",")[1].rstrip())
@@ -517,7 +517,7 @@ def load_IMU_datas_TUM_VI(path_to_sequence):
     timestamp = []
     gyro_data = []
     acc_data = []
-    with open(os.path.join(path_to_sequence,"mav0/imu0/data.txt")) as imu_file:
+    with open(os.path.join(path_to_sequence,"mav0/imu0/data.csv")) as imu_file:
         for line in imu_file:
             if len(line) > 0 and not line.startswith("#"):
                 imu_line=line.split(",")
