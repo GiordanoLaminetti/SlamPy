@@ -21,7 +21,7 @@ RUN if $build_dependences ; then \
 																									libdc1394-22-dev libraw1394-dev \
 																									libjpeg-dev libtiff5-dev \
 																									libopenexr-dev libeigen3-dev \
-																									qemu gcc-aarch64-linux-gnu \
+																									qemu gcc-aarch64-linux-gnu build-essential \
 																									libboost-all-dev libpcap-dev libssl-dev g++ ;\
 				ldconfig ;\
 				rm -rf /var/lib/apt/lists/* && apt-get clear ;\
@@ -41,7 +41,7 @@ RUN if $build_dependences ; then \
 				cd $Pangolin_Path && \
 				mkdir $Pangolin_Path/build && \
 				cd build && \
-				cmake .. && \
+				cmake $Pangolin_Path && \
 				make -j$(nproc) &&\
 				make install ;  fi
 
@@ -116,24 +116,19 @@ RUN if $build_orbslam3 ; then \
 ARG Orb_Slam2_PB_Path='/slampy/program/OrbSlam2-PythonBinding'
 ARG build_orbslam2=true
 
-RUN if [ ! -L "/usr/lib/x86_64-linux-gnu/libboost_python-py35.so" ]; then \
- 								ln -s /usr/lib/x86_64-linux-gnu/libboost_python-py36.so \
-								/usr/lib/x86_64-linux-gnu/libboost_python-py35.so ; fi ;\
-	 if [ ! -L "/usr/local/include/Eigen" ]; then\
+
+RUN	 if [ ! -L "/usr/local/include/Eigen" ]; then\
 			ln -s /usr/include/eigen3/Eigen /usr/local/include/Eigen ; fi
 
 RUN if $build_orbslam2 ; then \
 				mkdir -p $Orb_Slam2_PB_Path && \
-				/usr/bin/python3.6 -m pip install numpy && \
 				git clone https://github.com/GiordanoLaminetti/ORB_SLAM2-PythonBindings.git \
 						$Orb_Slam2_PB_Path && \
 				mkdir $Orb_Slam2_PB_Path/build && \
 				cd $Orb_Slam2_PB_Path/build && \
 				cmake $Orb_Slam2_PB_Path &&\
 				make -j$(nproc) &&\
-				make install &&\
-				ln -s /usr/local/lib/python3.5/dist-packages/orbslam2.so \
-         			/usr/local/lib/python3.8/dist-packages/orbslam2.so ; fi
+				make install; fi
 
 # OrbSlam3-python Bindings
 ARG Orb_Slam3_PB_Path='/slampy/program/OrbSlam3-PythonBinding'
@@ -148,13 +143,11 @@ RUN if $build_orbslam3 ; then \
 				cd $Orb_Slam3_PB_Path/build && \
 				cmake .. &&\
 				make -j$(nproc) &&\
-				make install &&\
-				ln -s /usr/local/lib/python3.5/dist-packages/orbslam3.so \
-         			/usr/local/lib/python3.8/dist-packages/ ;fi
+				make install ;fi
 
 #remove all the folder
 WORKDIR /slampy
-RUN rm -rf /slampy/program && ldconfig 
+RUN rm -rf /slampy/program && ldconfig
 
 #change user
 USER slampy
@@ -167,4 +160,3 @@ ENV PATH /slampy/.local/bin:$PATH
 RUN jupyter nbextension enable --py widgetsnbextension && jupyter nbextension enable --py plotlywidget
 
 EXPOSE 8888
-
