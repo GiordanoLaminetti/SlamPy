@@ -75,7 +75,8 @@ class Slam:
     def process_image_imu_stereo(self, image_left, image_right, tframe, imu):
         if self.sensor_type == Sensor.STEREO_IMU:
             self.slam.process_image_imu_stereo(
-                image_left, image_right, tframe, "0", imu)
+                image_left, image_right, tframe, "0", imu
+            )
         else:
             raise Exception("The sensor type is not STREO_IMU")
 

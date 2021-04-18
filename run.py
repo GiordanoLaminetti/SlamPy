@@ -20,11 +20,10 @@ def run(args):
         raise ValueError(f"Cannot find setting file at {setting_file}")
     if args.pose_id < -1:
         raise ValueError(f"Pose index must be -1 or >0")
-    
 
     with open(args.settings) as fs:
-         settings_yalm = yaml.safe_load(fs)
-         print("\nAlgorithm " + settings_yalm["SLAM.alg"] + " has been set\n")
+        settings_yalm = yaml.safe_load(fs)
+        print("\nAlgorithm " + settings_yalm["SLAM.alg"] + " has been set\n")
 
     print("Dataset selected: " + os.path.basename(args.dataset) + "\n")
 
@@ -61,24 +60,24 @@ def run(args):
                 raise ValueError(f"failed to load image {image_name}")
 
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-           
+
             state = app.process_image_mono(image, timestamps[idx])
 
             # NOTE: we buid a default invalid depth, in the case of system failure
             if state == slampy.State.OK:
-                depth = app.get_depth() 
+                depth = app.get_depth()
                 pose_past_frame_to_current = app.get_pose_to_target(
                     precedent_frame=args.pose_id
                 )
-                name = os.path.splitext(os.path.basename(image_name))[0] 
-                
-                depth_path = os.path.join(dest_depth, name)  
-                save_depth(depth_path, depth) 
+                name = os.path.splitext(os.path.basename(image_name))[0]
+
+                depth_path = os.path.join(dest_depth, name)
+                save_depth(depth_path, depth)
 
                 pose_path = os.path.join(dest_pose, name)
                 save_pose(pose_path, pose_past_frame_to_current)
 
-                curr_pose = app.get_pose_to_target(-1) 
+                curr_pose = app.get_pose_to_target(-1)
                 if curr_pose is not None:
                     save_pose_txt(args, name, curr_pose)
 
@@ -89,12 +88,11 @@ def run(args):
 
             states.append(state)
             pbar.update(1)
-        
-        if args.is_evaluate_depth: 
-            mean_errors = np.array(errors).mean(0) 
+
+        if args.is_evaluate_depth:
+            mean_errors = np.array(errors).mean(0)
             save_results = os.path.join(args.dest, "results.txt")
             save_depth_err_results(save_results, "mean values", mean_errors)
-    
 
     # NOTE: final dump of log.txt file
     with open(os.path.join(args.dest, "log.txt"), "w") as f:
@@ -164,7 +162,7 @@ parser.add_argument(
     type=str,
     help="which dataset type",
     default="KITTI_VO",
-    choices=["TUM", "KITTI_VO", "KITTI","OTHERS"],
+    choices=["TUM", "KITTI_VO", "KITTI", "OTHERS"],
 )
 
 parser.add_argument(
