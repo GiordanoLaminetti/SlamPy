@@ -94,7 +94,7 @@ class System:
         """
         self.image_shape = image_left.shape
         self.slam.process_image_stereo(image_left, image_right, tframe)
-        self.image = image
+        self.image = image_left
         if self.get_state() == State.OK:
             self.pose_array.append(self.get_pose_to_target())
         return self.get_state()
@@ -141,7 +141,7 @@ class System:
         """
         self.image_shape = image_left.shape
         self.slam.process_image_imu_stereo(image_left, image_right, tframe, imu)
-        self.image = image
+        self.image = image_left
         if self.get_state() == State.OK:
             self.pose_array.append(self.get_pose_to_target())
         return self.get_state()
