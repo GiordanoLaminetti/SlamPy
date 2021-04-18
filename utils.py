@@ -232,8 +232,7 @@ def save_pose_txt(args, name, pose):
     """
     pose_file_path = os.path.join(args.dest, "pose.txt")
     fp = open(pose_file_path, "a")
-    pose34 = pose[:3]
-
+    pose34 = pose[:3] 
     fp.write(name)
     for row in pose34:
         fp.write(" ")
@@ -241,6 +240,31 @@ def save_pose_txt(args, name, pose):
     # fp.write('\n')
     fp.write("\n")
     fp.close()
+
+
+
+
+def save_pose_and_times_txt(args, name, pose):
+    """Save pose and time in two different txt files."""
+    
+    time_file_path = os.path.join(args.dest, "times.txt")
+    pose_file_path = os.path.join(args.dest, "pose.txt")
+    fd = open(time_file_path, "a")
+    fp = open(pose_file_path, "a")
+    pose34 = pose[:3] 
+    fd.write(name)
+    fd.write("\n")
+    fd.close()
+    line=""
+    for row in pose34:   
+        line+=(" ".join(str(round(i, 10)) for i in row))
+        line+=(" ")
+    line=line[:-1]
+    line+=("\n")
+    fp.write(line)
+    # fp.write('\n')
+    fp.close()
+
 
 
 def evaluate_pose(args):
@@ -374,6 +398,7 @@ def get_error(args, filename, points, gt_filename):
     return err
 
 
+
 def load_images_KITTI_VO(path_to_sequence):
     """Return the sequence of the images found in the path and the corrispondent timestamp
 
@@ -416,3 +441,95 @@ def load_images_TUM(path_to_sequence, file_name):
                 timestamps.append(float(t))
 
     return [os.path.join(path_to_sequence, name) for name in rgb_filenames], timestamps
+
+
+def load_images_OTHERS(path_to_sequence):
+
+    """Return the sequence of the images found in the path and the corrispondent timestamp
+
+    Args:
+        path_to_sequence : the sequence in witch we can found the image sequences
+
+    Returns :
+        two array : one contains the sequence of the image filename and the second the timestamp in whitch they are acquired
+
+    Inside of path_to_sequence must be: +data
+                                           xxxxxxxx.png 
+                                           xxxxxxxy.png
+                                           ....
+                                        -times.txt 
+    where times.txt simply contains timestamps of every frame
+
+    """
+
+    timestamps = []
+    framenames = []
+
+    with open(os.path.join(path_to_sequence, "times.txt")) as times_file:
+        for line in times_file:
+            if len(line) > 0 and not line.startswith("#"):
+                timestamps.append(float(line))
+                
+    for framename in sorted(os.listdir(os.path.join(path_to_sequence,"data"))):
+        if framename.endswith(".png"):
+            framenames.append(framename)
+
+    return [os.path.join(path_to_sequence,"data",name) for name in framenames], timestamps
+
+
+def load_images_TUM_VI(path_to_sequence):
+
+    """ This loader is created for Visual Inertial TUM datasets. Format of such datasets is:
+        path_to_sequence/mav0/cam0/+data/xxxx.png
+                                  /-times.txt
+    """
+    timestamps = []
+    framenames = []
+    
+    with open(os.path.join(path_to_sequence,"mav0/cam0/times.txt")) as times_file:
+        for line in times_file:
+            if len(line) > 0 and not line.startswith("#"):
+                framenames.append(line.split()[0] + ".png")
+                timestamps.append(float(line.split()[1]))
+                
+    return [os.path.join(path_to_sequence,"mav0/cam0/data",name) for name in framenames], timestamps
+
+
+def load_images_EuRoC(path_to_sequence):
+
+    """ This loader is created for Visual Inertial EuRoC datasets. Format of such datasets is:
+        path_to_sequence/mav0/cam0/+data/xxxx.png
+                                  /-times.txt
+    """
+    timestamps = []
+    framenames = []
+    
+    with open(os.path.join(path_to_sequence,"mav0/cam0/data.csv")) as times_file:
+        for line in times_file:
+            if len(line) > 0 and not line.startswith("#"):
+                framenames.append(line.split(",")[1].rstrip())
+                timestamps.append(float(line.split(",")[0])*1e-9)
+                
+    return [os.path.join(path_to_sequence,"mav0/cam0/data",name) for name in framenames], timestamps
+
+
+def load_IMU_datas_TUM_VI(path_to_sequence):
+    timestamp = []
+    gyro_data = []
+    acc_data = []
+    with open(os.path.join(path_to_sequence,"mav0/imu0/data.csv")) as imu_file:
+        for line in imu_file:
+            if len(line) > 0 and not line.startswith("#"):
+                imu_line=line.split(",")
+                timestamp.append(float(imu_line[0])*1e-9) 
+                gyro_data.append([float(imu_line[1]),float(imu_line[2]),float(imu_line[3])]) 
+                acc_data.append([float(imu_line[4]),float(imu_line[5]),float(imu_line[6])])
+    
+    return acc_data,gyro_data,timestamp
+
+
+
+
+
+
+

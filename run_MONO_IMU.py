@@ -28,20 +28,21 @@ def run(args):
 
     print("Dataset selected: " + os.path.basename(args.dataset) + "\n")
 
-    app = slampy.System(setting_file, slampy.Sensor.MONOCULAR)
+    app = slampy.System(setting_file, slampy.Sensor.MONOCULAR_IMU)
 
     print("\n")
 
-    # TODO: generic loader an not KITTI one
-
-    if args.data_type == "TUM":
-        image_filenames, timestamps = load_images_TUM(args.dataset, "rgb.txt")
-    elif args.data_type == "KITTI_VO":
-        image_filenames, timestamps = load_images_KITTI_VO(args.dataset)
+    if args.data_type == "TUM_VI":
+        image_filenames, timestamps = load_images_TUM_VI(args.dataset)
+    elif args.data_type == "EUROC":
+        image_filenames, timestamps = load_images_EuRoC(args.dataset)
     elif args.data_type == "OTHERS":
         image_filenames, timestamps = load_images_OTHERS(args.dataset)
 
     num_images = len(image_filenames)
+
+    if args.data_type == "TUM_VI" or args.data_type =="EUROC":
+        acc_data, gyro_data, IMUtimestamps = load_IMU_datas_TUM_VI(args.dataset)
 
     dest_depth = os.path.join(args.dest, "depth")
     dest_pose = os.path.join(args.dest, "pose")
@@ -52,17 +53,36 @@ def run(args):
     states = []
     errors = []
 
+    
+    #finds first useful imu data, assuming imu starts recording way before camera
+    firstIMU=0
+    while(IMUtimestamps[firstIMU]<=timestamps[0]):
+        firstIMU += 1
+    firstIMU -= 1
+    
+    imu = [] # array of valid imu measurments: one imu measure is 7 floats [acc x, acc y, acc z, gyro x, gyro y, gyro z, timestamp]
+
     with tqdm(total=num_images) as pbar:
         for idx, image_name in enumerate(image_filenames):
             # TODO: it is image loader duty to provide correct images
-            # image_name = image_name.replace(".png", ".jpg")
             image = cv2.imread(image_name)
             if image is None:
                 raise ValueError(f"failed to load image {image_name}")
 
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-           
-            state = app.process_image_mono(image, timestamps[idx])
+
+            imu.clear() #clear imu measures from last frame
+
+            
+
+            if idx > 0:  #select only those imu meas that occour in time before the current frame
+                while(IMUtimestamps[firstIMU]<=timestamps[idx]):                 
+                    imu_valid_meas = (acc_data[firstIMU] + gyro_data[firstIMU])
+                    imu_valid_meas.append(IMUtimestamps[firstIMU])
+                    imu.append(imu_valid_meas)
+                    firstIMU += 1
+          
+            state = app.process_image_imu_mono(image, timestamps[idx], np.array(imu))
 
             # NOTE: we buid a default invalid depth, in the case of system failure
             if state == slampy.State.OK:
@@ -106,6 +126,8 @@ def run(args):
         evaluate_pose(args)
         eval_tool = KittiEvalOdom()
         eval_tool.eval(args)
+    
+    app.shutdown()
 
 
 parser = argparse.ArgumentParser(
@@ -164,7 +186,7 @@ parser.add_argument(
     type=str,
     help="which dataset type",
     default="KITTI_VO",
-    choices=["TUM", "KITTI_VO", "KITTI","OTHERS"],
+    choices=["TUM", "KITTI_VO", "KITTI","OTHERS","TUM_VI","EUROC"],
 )
 
 parser.add_argument(
@@ -173,7 +195,6 @@ parser.add_argument(
     help="the gt depth files of the dataset",
     default="/media/Datasets/KITTI_VO_SGM/10/depth",
 )
-# /media/Datasets/TUM/freiburg3_convert/depth
 
 parser.add_argument(
     "--gt_pose_dir",
