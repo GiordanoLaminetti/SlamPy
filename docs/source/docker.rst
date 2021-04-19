@@ -22,13 +22,18 @@ for downloading the container you can type ::
     docker pull giordanolaminetti/slampy:tagname
 
 
-with the addiction of ``-focal`` after ``tagname`` you can download the builds with ubuntu 20.04 (focal fossa), by default the docker are built over ubuntu 18.04::
+with the addiction of ``-focal`` after ``tagname`` you can download the builds with ubuntu 20.04 (focal fossa), by default the docker are built over ubuntu 18.04 (Bionic Beaver)::
 
   docker pull giordanolaminetti/slampy:latest-focal
+
+with the addiction of ``-ros-melodic`` after ``tagname`` you can download the ubuntu 18.04 (Bionic Beaver) with ros noetic already installed ::
+
+    docker pull giordanolaminetti/slampy:latest-ros-melodic
+
 
 with the addiction of ``-ros-noetic`` after ``tagname`` you can download the ubuntu 20.04 (focal fossa) with ros noetic already installed ::
 
-  docker pull giordanolaminetti/slampy:latest-focal
+  docker pull giordanolaminetti/slampy:latest-ros-noetic
 
 ----------------------
 Build docker container

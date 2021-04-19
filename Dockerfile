@@ -25,9 +25,10 @@ RUN if $build_dependences ; then \
 																									libboost-all-dev libpcap-dev libssl-dev g++ ;\
 				ldconfig ;\
 				rm -rf /var/lib/apt/lists/* && apt-get clear ;\
-				python3 -mpip install numpy pyopengl Pillow pybind11 pandas  ; \
 				update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 1;\
 				update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 2;\
+				python3 -mpip install --upgrade pip ; \
+				python3 -mpip install numpy pyopengl Pillow pybind11 pandas  ; \
 				python3 -mpip install poetry setuptools ; \
 				mkdir /slampy/program; fi
 
