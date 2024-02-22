@@ -50,10 +50,10 @@ docker pull giordanolaminetti/slampy:tag
 
 The `tag` correspond to the container you need:
 
-- `base` correspond to a container with installed only the dependences
-- `orbslam2` correspond to a container with only ORB_SLAM2 installed
-- `orbslam3` correspond to a container with only ORB_SLAM2 installed
-- `latest` correspond to a container with ORB_SLAM2 and ORB_SLAM3 installed
+- `base` corresponds to a container with only the dependences installed.
+- `orbslam2` corresponds to a container with only ORB_SLAM2 installed.
+- `orbslam3` corresponds to a container with only ORB_SLAM3 installed.
+- `latest` corresponds to a container with both ORB_SLAM2 and ORB_SLAM3 installed.
 
 When the image is ready, you can create a new container running:
 
